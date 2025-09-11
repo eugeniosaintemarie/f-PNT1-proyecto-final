@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "BeuNbWK/yN0=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Administrator\\Documents\\Git\\f-PNT1-proyecto-final\\EncontraTuMascota\\EncontraTuMascota.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.22.1\\microsoft.visualstudio.azure.containers.tools.targets.1.22.1.nupkg.sha512"
+  ],
+  "logs": []
+}

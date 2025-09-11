@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "EncontraTuMascota": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
