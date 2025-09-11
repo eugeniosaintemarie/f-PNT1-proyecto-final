@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>290</x>
+      <y>110</y>
+      <w>200</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>Mascota
+--
+- id: int {PK}
+- fotoUrl: string
+- calleEncontrada: string
+- fechaPublicacion: DateTime
+--
++ getId(): int
++ setId(id: int): void
++ getFotoUrl(): string
++ setFotoUrl(url: string): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>120</x>
+      <y>350</y>
+      <w>230</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>Publicacion
+--
+- id: int {PK}
+- mascotaId: int {FK}
+- descripcion: string
+- contacto: string
+- fecha: DateTime
+--
++ getId(): int
++ setId(id: int): void
++ getDescripcion(): string
++ setDescripcion(desc: string): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>500</x>
+      <y>350</y>
+      <w>220</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>Usuario
+--
+- id: int {PK}
+- nombre: string
+- email: string
+--
++ getId(): int
++ setId(id: int): void
++ getNombre(): string
++ setNombre(nombre: string): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>330</x>
+      <y>260</y>
+      <w>110</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=-
+m1=1
+m2=1
+se asocia con</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>380</y>
+      <w>180</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=-
+m1=0..*
+m2=1
+hace</panel_attributes>
+    <additional_attributes>10.0;20.0;160.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>20</x>
+      <y>20</y>
+      <w>240</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>Entidades Fuertes:
+- Mascota (base de la app)
+
+Entidades Débiles:
+- Publicación (depende de Mascota)
+- Usuario (futuro, para login)
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>520</x>
+      <y>70</y>
+      <w>200</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>Cardinalidades:
+- Usuario → Publicación (1:N)
+- Publicación → Mascota (1:1)
+bg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
