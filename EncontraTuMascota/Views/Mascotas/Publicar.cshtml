@@ -1,0 +1,69 @@
+@model EncontraTuMascota.Models.Mascota
+
+@{
+    ViewData["Title"] = "Publicar Mascota";
+}
+
+<div class="publicar-page">
+    <div class="page-header">
+        <h1>🐕 Publicar Mascota Encontrada</h1>
+        <p class="lead">Ayúdanos a reunir a las mascotas con sus dueños</p>
+    </div>
+
+    <div class="form-container">
+        <form asp-action="Publicar" method="post" class="mascota-form">
+            @Html.AntiForgeryToken()
+            
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+            <div class="form-group">
+                <label asp-for="FotoUrl" class="form-label"></label>
+                <input asp-for="FotoUrl" class="form-control" placeholder="https://ejemplo.com/foto-mascota.jpg" />
+                <span asp-validation-for="FotoUrl" class="text-danger"></span>
+                <small class="form-text">URL de la imagen de la mascota encontrada</small>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CalleEncontrada" class="form-label"></label>
+                <input asp-for="CalleEncontrada" class="form-control" placeholder="Ej: Av. Corrientes 1234" />
+                <span asp-validation-for="CalleEncontrada" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="descripcion" class="form-label">Descripción</label>
+                <textarea id="descripcion" name="descripcion" class="form-control" rows="5" 
+                          placeholder="Describe la mascota: color, tamaño, raza, características especiales, etc." 
+                          required minlength="10" maxlength="1000"></textarea>
+                <small class="form-text">Mínimo 10 caracteres, máximo 1000</small>
+            </div>
+
+            <div class="form-group">
+                <label for="contacto" class="form-label">Información de Contacto</label>
+                <input id="contacto" name="contacto" type="text" class="form-control" 
+                       placeholder="Teléfono, email u otra forma de contacto" required maxlength="200" />
+                <small class="form-text">Cómo pueden contactarte si reconocen a la mascota</small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <span>📢</span> Publicar Mascota
+                </button>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="info-box">
+        <h3>💡 Consejos para una mejor publicación</h3>
+        <ul>
+            <li>Incluye una foto clara de la mascota</li>
+            <li>Describe características distintivas (color, tamaño, raza)</li>
+            <li>Indica la ubicación exacta donde la encontraste</li>
+            <li>Proporciona información de contacto válida</li>
+        </ul>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="home-page">
+    <div class="hero-section">
+        <h1>Bienvenido a Encontrá Tu Mascota</h1>
+        <p class="lead">Ayudamos a reunir mascotas perdidas con sus dueños</p>
+    </div>
+
+    <div class="features-section">
+        <div class="row">
+            <div class="col-md-4">
+                <a asp-controller="Mascotas" asp-action="Publicar" class="feature-link">
+                    <div class="feature-card">
+                        <h3>🐕 Publicar Mascota</h3>
+                        <p>¿Encontraste una mascota perdida? Publica su información para ayudar a encontrar a su dueño.</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a asp-controller="Mascotas" asp-action="Buscar" class="feature-link">
+                    <div class="feature-card">
+                        <h3>🔍 Buscar Mascotas</h3>
+                        <p>¿Perdiste tu mascota? Busca en nuestras publicaciones para ver si alguien la encontró.</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a asp-controller="Contacto" asp-action="Index" class="feature-link">
+                    <div class="feature-card">
+                        <h3>💬 Contactar</h3>
+                        <p>Conecta directamente con las personas que encontraron o buscan mascotas.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

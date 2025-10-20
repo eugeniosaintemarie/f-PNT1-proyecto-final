@@ -1,0 +1,82 @@
+@model EncontraTuMascota.Models.Usuario
+
+@{
+    ViewData["Title"] = "Contacto";
+}
+
+<div class="contacto-page">
+    <div class="page-header">
+        <h1>💬 Contacto</h1>
+        <p class="lead">¿Tienes preguntas o sugerencias? Escríbenos</p>
+    </div>
+
+    <div class="contact-container">
+        <div class="contact-form-section">
+            <form asp-action="Index" method="post" class="contact-form">
+                @Html.AntiForgeryToken()
+                
+                <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+                <div class="form-group">
+                    <label asp-for="Nombre" class="form-label"></label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Tu nombre completo" />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" type="email" placeholder="tucorreo@ejemplo.com" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="mensaje" class="form-label">Mensaje</label>
+                    <textarea id="mensaje" name="mensaje" class="form-control" rows="6" 
+                              placeholder="Escribe tu mensaje aquí..." required></textarea>
+                    @if (ViewData.ModelState.ContainsKey("mensaje"))
+                    {
+                        <span class="text-danger">@ViewData.ModelState["mensaje"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
+                    }
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span>📧</span> Enviar Mensaje
+                    </button>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Volver al inicio</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="contact-info-section">
+            <div class="info-card">
+                <h3>📍 Información</h3>
+                <p>
+                    <strong>Encontrá Tu Mascota</strong> es una plataforma dedicada a ayudar a 
+                    reunir mascotas perdidas con sus dueños.
+                </p>
+            </div>
+
+            <div class="info-card">
+                <h3>💡 ¿Cómo funciona?</h3>
+                <ol>
+                    <li>Si encontraste una mascota, publícala en la plataforma</li>
+                    <li>Si perdiste tu mascota, busca en nuestras publicaciones</li>
+                    <li>Contacta directamente con quien la encontró</li>
+                </ol>
+            </div>
+
+            <div class="info-card">
+                <h3>🤝 Colabora</h3>
+                <p>
+                    Ayúdanos a mejorar compartiendo la plataforma y siendo parte 
+                    de esta comunidad que cuida a nuestras mascotas.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
