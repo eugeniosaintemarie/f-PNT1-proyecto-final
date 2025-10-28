@@ -4,17 +4,25 @@
     ViewData["Title"] = "Publicar Mascota";
 }
 
+@* 
+    Formulario para publicar una mascota encontrada.
+    Tiene de todo: foto, sexo, raza, ubicación y datos de contacto.
+    Acá es donde la gente sube info de los perritos que encontró en la calle.
+*@
 <div class="publicar-page">
     <div class="page-header">
         <h1>🐕 Publicar mascota encontrada</h1>
     </div>
 
     <div class="form-container">
+        @* El enctype="multipart/form-data" es OBLIGATORIO para poder subir archivos *@
         <form asp-action="Publicar" method="post" enctype="multipart/form-data" class="mascota-form">
             @Html.AntiForgeryToken()
             
+            @* Si hay errores de validación, se muestran acá arriba *@
             <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
 
+            @* Input para subir la foto de la mascota *@
             <div class="form-group">
                 <label asp-for="FotoUrl" class="form-label"></label>
                 <input type="file" name="foto" id="foto" class="form-control" accept="image/*" required />
@@ -22,6 +30,7 @@
                 <small class="form-text">Seleccione una imagen de la mascota encontrada</small>
             </div>
 
+            @* Sexo: Masculino o Femenino (radio buttons) *@
             <div class="form-group">
                 <label asp-for="Sexo" class="form-label"></label>
                 <div class="radio-group">
@@ -37,6 +46,7 @@
                 <span asp-validation-for="Sexo" class="text-danger"></span>
             </div>
 
+            @* Dropdown con todas las razas disponibles *@
             <div class="form-group">
                 <label asp-for="Raza" class="form-label"></label>
                 <select asp-for="Raza" class="form-control" asp-items="Html.GetEnumSelectList<EncontraTuMascota.Models.Raza>()">
@@ -45,6 +55,7 @@
                 <span asp-validation-for="Raza" class="text-danger"></span>
             </div>
 
+            @* Dónde encontraste a la mascota *@
             <div class="form-group">
                 <label asp-for="Ubicacion" class="form-label"></label>
                 <input asp-for="Ubicacion" class="form-control" 
@@ -56,12 +67,14 @@
             
             <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">📞 Datos de Contacto</h3>
 
+            @* Tu nombre para que te puedan contactar *@
             <div class="form-group">
                 <label asp-for="NombreContacto" class="form-label"></label>
                 <input asp-for="NombreContacto" class="form-control" placeholder="Juan Pérez" />
                 <span asp-validation-for="NombreContacto" class="text-danger"></span>
             </div>
 
+            @* Teléfono (tiene que ser formato argentino con +54) *@
             <div class="form-group">
                 <label asp-for="TelefonoContacto" class="form-label"></label>
                 <input asp-for="TelefonoContacto" class="form-control" placeholder="+541112345678" />
@@ -69,6 +82,7 @@
                 <small class="form-text">Formato: +54 seguido del código de área y número (ej: +541112345678)</small>
             </div>
 
+            @* Email de contacto *@
             <div class="form-group">
                 <label asp-for="EmailContacto" class="form-label"></label>
                 <input asp-for="EmailContacto" class="form-control" type="email" placeholder="contacto@ejemplo.com" />
@@ -77,6 +91,7 @@
 
             <hr style="margin: 2rem 0; border-color: #ddd;" />
 
+            @* Descripción: acá podés contar más detalles de la mascota *@
             <div class="form-group">
                 <label for="descripcion" class="form-label">Descripción</label>
                 <textarea id="descripcion" name="descripcion" class="form-control" rows="5" 
@@ -85,6 +100,7 @@
                 <small class="form-text">Mínimo 10 caracteres, máximo 1000</small>
             </div>
 
+            @* Botones de acción *@
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">
                     <span>📢</span> Publicar Mascota
@@ -95,6 +111,7 @@
     </div>
 </div>
 
+@* Scripts de validación del lado del cliente (jQuery Validation) *@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

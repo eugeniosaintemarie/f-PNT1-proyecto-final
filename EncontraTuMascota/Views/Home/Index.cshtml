@@ -1,7 +1,12 @@
 @{
+    // El título que aparece en la pestaña del navegador
     ViewData["Title"] = "🐾";
 }
 
+@* 
+    Página principal del sitio.
+    Acá tenés dos opciones: publicar una mascota que encontraste o buscar si alguien encontró la tuya.
+*@
 <div class="home-page">
     <div class="hero-section">
         <h1>Bienvenido a Encontrá Tu Mascota</h1>
@@ -10,6 +15,7 @@
 
     <div class="features-section">
         <div class="row">
+            @* Card para publicar una mascota encontrada *@
             <div class="col-md-6">
                 <a asp-controller="Mascotas" asp-action="Publicar" class="feature-link">
                     <div class="feature-card">
@@ -19,6 +25,7 @@
                     </div>
                 </a>
             </div>
+            @* Card para buscar mascotas perdidas *@
             <div class="col-md-6">
                 <a asp-controller="Mascotas" asp-action="Buscar" class="feature-link">
                     <div class="feature-card">

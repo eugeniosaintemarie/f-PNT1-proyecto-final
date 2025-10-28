@@ -2,6 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EncontraTuMascota.Models;
 
+/// <summary>
+/// Lista de razas más comunes que podés encontrar en Argentina.
+/// Si no está la que buscás, mandale "Mestizo" o "Otra" y listo.
+/// </summary>
 public enum Raza
 {
     [Display(Name = "Labrador")]

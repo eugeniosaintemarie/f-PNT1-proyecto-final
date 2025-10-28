@@ -2,14 +2,20 @@
 
 @{
     ViewData["Title"] = "Buscar Mascotas";
+    // Traemos las publicaciones que están en el ViewBag (se cargan desde el controller)
     var publicaciones = ViewBag.Publicaciones as List<EncontraTuMascota.Models.Publicacion> ?? new();
 }
 
+@* 
+    Acá es donde buscás mascotas perdidas.
+    Podés filtrar por ubicación o ver todas las que hay publicadas.
+*@
 <div class="buscar-page">
     <div class="page-header">
         <h1>🔍 Buscar mascotas perdidas</h1>
     </div>
 
+    @* Si acabás de publicar una mascota, te sale este mensaje de éxito *@
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success">
@@ -17,6 +23,7 @@
         </div>
     }
 
+    @* Formulario de búsqueda por ubicación *@
     <div class="search-section">
         <form method="get" asp-action="Buscar" class="search-form">
             <div class="search-group">
@@ -29,15 +36,20 @@
         </form>
     </div>
 
+    @* Resultados de la búsqueda *@
     <div class="results-section">
         @if (Model != null && Model.Any())
         {
+            @* Si hay resultados, los mostramos en cards *@
             <h2>Mascotas Encontradas (@Model.Count)</h2>
             <div class="mascotas-grid">
                 @foreach (var mascota in Model)
                 {
+                    // Buscamos la publicación asociada a esta mascota
                     var publicacion = publicaciones.FirstOrDefault(p => p.MascotaId == mascota.Id);
+                    
                     <div class="mascota-card">
+                        @* Foto de la mascota *@
                         <div class="mascota-image">
                             @if (!string.IsNullOrEmpty(mascota.FotoUrl))
                             {
@@ -48,10 +60,13 @@
                                 <div class="no-image">📷 Sin imagen</div>
                             }
                         </div>
+                        
+                        @* Info de la mascota *@
                         <div class="mascota-info">
                             <h3>Encontrada en: @mascota.Ubicacion</h3>
                             <p class="mascota-details">
                                 <strong>Sexo:</strong> @mascota.Sexo.ToString() <br />
+                                @* Acá reemplazamos los nombres de enum por los nombres bonitos *@
                                 <strong>Raza:</strong> @mascota.Raza.ToString().Replace("GoldenRetriever", "Golden Retriever")
                                     .Replace("PastorAleman", "Pastor Alemán")
                                     .Replace("YorkshireTerrier", "Yorkshire Terrier")
@@ -62,6 +77,7 @@
                                 <strong>Fecha:</strong> @mascota.FechaPublicacion.ToString("dd/MM/yyyy HH:mm")
                             </p>
                             
+                            @* Si hay publicación, mostramos descripción y contacto *@
                             @if (publicacion != null)
                             {
                                 <p class="descripcion">@publicacion.Descripcion</p>
@@ -79,6 +95,7 @@
         }
         else if (!string.IsNullOrWhiteSpace(ViewBag.Termino as string))
         {
+            @* Si buscaste algo y no hay resultados *@
             <div class="no-results">
                 <p>No se encontraron mascotas con el término "<strong>@ViewBag.Termino</strong>"</p>
                 <a asp-action="Buscar" class="btn btn-secondary">Ver todas</a>
@@ -86,6 +103,7 @@
         }
         else
         {
+            @* Si todavía no hay ninguna mascota publicada *@
             <div class="no-results">
                 <p>🐾 Aún no hay mascotas publicadas</p>
                 <p>¿Encontraste una mascota? <a asp-action="Publicar">Publícala acá</a></p>

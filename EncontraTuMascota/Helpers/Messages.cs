@@ -1,8 +1,12 @@
 namespace EncontraTuMascota.Helpers;
 
+/// <summary>
+/// Mensajes predefinidos para no estar escribiendo todo el tiempo lo mismo.
+/// Están divididos en categorías: Success, Error y Validation.
+/// </summary>
 public static class Messages
 {
-    // Mensajes de éxito
+    // Mensajes cuando sale todo bien
     public static class Success
     {
         public const string MascotaPublicada = "¡Mascota publicada exitosamente!";
@@ -10,7 +14,7 @@ public static class Messages
         public const string OperacionExitosa = "Operación realizada con éxito";
     }
 
-    // Mensajes de error
+    // Mensajes cuando algo sale mal
     public static class Error
     {
         public const string ErrorGeneral = "Ocurrió un error. Por favor, intente nuevamente.";
