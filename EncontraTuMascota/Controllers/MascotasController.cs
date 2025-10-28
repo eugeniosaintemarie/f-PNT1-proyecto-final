@@ -9,6 +9,12 @@ public class MascotasController : Controller
     // Lista temporal en memoria (después se reemplazará con BD)
     private static readonly MascotasList _mascotas = new();
     private static readonly PublicacionesList _publicaciones = new();
+    private readonly IWebHostEnvironment _webHostEnvironment;
+
+    public MascotasController(IWebHostEnvironment webHostEnvironment)
+    {
+        _webHostEnvironment = webHostEnvironment;
+    }
 
     public IActionResult Publicar()
     {
@@ -17,8 +23,29 @@ public class MascotasController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Publicar(Mascota mascota, string descripcion, string contacto)
+    public async Task<IActionResult> Publicar(Mascota mascota, string descripcion, IFormFile? foto)
     {
+        // Procesar la foto si se subió
+        if (foto != null && foto.Length > 0)
+        {
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "mascotas");
+            Directory.CreateDirectory(uploadsFolder);
+
+            var uniqueFileName = $"{Guid.NewGuid()}_{foto.FileName}";
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await foto.CopyToAsync(fileStream);
+            }
+
+            mascota.FotoUrl = $"/uploads/mascotas/{uniqueFileName}";
+        }
+        else
+        {
+            ModelState.AddModelError("FotoUrl", "La foto es obligatoria");
+        }
+
         if (ModelState.IsValid)
         {
             // Asignar ID autoincremental
@@ -33,7 +60,7 @@ public class MascotasController : Controller
                 Id = _publicaciones.Count > 0 ? _publicaciones.Max(p => p.Id) + 1 : 1,
                 MascotaId = mascota.Id,
                 Descripcion = descripcion,
-                Contacto = contacto,
+                Contacto = $"{mascota.NombreContacto} - Tel: {mascota.TelefonoContacto} - Email: {mascota.EmailContacto}",
                 Fecha = DateTime.Now,
                 Mascota = mascota
             };
@@ -54,7 +81,7 @@ public class MascotasController : Controller
         if (!string.IsNullOrWhiteSpace(termino))
         {
             mascotas = mascotas.Where(m => 
-                m.CalleEncontrada!.Contains(termino, StringComparison.OrdinalIgnoreCase));
+                m.Ubicacion!.Contains(termino, StringComparison.OrdinalIgnoreCase));
         }
 
         ViewBag.Termino = termino;

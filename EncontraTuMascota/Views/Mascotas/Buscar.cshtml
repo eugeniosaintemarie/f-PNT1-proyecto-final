@@ -7,8 +7,7 @@
 
 <div class="buscar-page">
     <div class="page-header">
-        <h1>🔍 Buscar Mascotas</h1>
-        <p class="lead">Encuentra mascotas perdidas en tu zona</p>
+        <h1>🔍 Buscar mascotas perdidas</h1>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
@@ -22,7 +21,7 @@
         <form method="get" asp-action="Buscar" class="search-form">
             <div class="search-group">
                 <input type="text" name="termino" value="@ViewBag.Termino" 
-                       class="search-input" placeholder="Buscar por calle o ubicación..." />
+                       class="search-input" placeholder="Buscar por calle o ubicación" />
                 <button type="submit" class="btn btn-search">
                     <span>🔎</span> Buscar
                 </button>
@@ -50,7 +49,15 @@
                             }
                         </div>
                         <div class="mascota-info">
-                            <h3>Encontrada en: @mascota.CalleEncontrada</h3>
+                            <h3>Encontrada en: @mascota.Ubicacion</h3>
+                            <p class="mascota-details">
+                                <strong>Sexo:</strong> @mascota.Sexo.ToString() <br />
+                                <strong>Raza:</strong> @mascota.Raza.ToString().Replace("GoldenRetriever", "Golden Retriever")
+                                    .Replace("PastorAleman", "Pastor Alemán")
+                                    .Replace("YorkshireTerrier", "Yorkshire Terrier")
+                                    .Replace("HuskySiberiano", "Husky Siberiano")
+                                    .Replace("CockerSpaniel", "Cocker Spaniel")
+                            </p>
                             <p class="fecha">
                                 <strong>Fecha:</strong> @mascota.FechaPublicacion.ToString("dd/MM/yyyy HH:mm")
                             </p>
@@ -58,9 +65,12 @@
                             @if (publicacion != null)
                             {
                                 <p class="descripcion">@publicacion.Descripcion</p>
-                                <p class="contacto">
-                                    <strong>📞 Contacto:</strong> @publicacion.Contacto
-                                </p>
+                                <div class="contacto-box">
+                                    <strong>📞 Contacto:</strong><br />
+                                    <strong>Nombre:</strong> @mascota.NombreContacto<br />
+                                    <strong>Teléfono:</strong> @mascota.TelefonoContacto<br />
+                                    <strong>Email:</strong> @mascota.EmailContacto
+                                </div>
                             }
                         </div>
                     </div>
@@ -78,7 +88,7 @@
         {
             <div class="no-results">
                 <p>🐾 Aún no hay mascotas publicadas</p>
-                <p>¿Encontraste una mascota? <a asp-action="Publicar">Publícala aquí</a></p>
+                <p>¿Encontraste una mascota? <a asp-action="Publicar">Publícala acá</a></p>
             </div>
         }
     </div>

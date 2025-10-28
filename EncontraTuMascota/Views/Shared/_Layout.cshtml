@@ -4,18 +4,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Encontrá Tu Mascota</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body class="site-wrapper">
     <header>
         <nav class="navbar">
             <div class="container">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">Encontrá Tu Mascota</a>
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <span class="logo-icon">🐾</span> Encontrá Tu Mascota
+                </a>
                 <ul class="nav-menu">
-                    <li><a asp-controller="Home" asp-action="Index">Inicio</a></li>
                     <li><a asp-controller="Mascotas" asp-action="Publicar">Publicar Mascota</a></li>
                     <li><a asp-controller="Mascotas" asp-action="Buscar">Buscar Mascotas</a></li>
-                    <li><a asp-controller="Contacto" asp-action="Index">Contacto</a></li>
                 </ul>
             </div>
         </nav>

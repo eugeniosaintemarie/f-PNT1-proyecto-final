@@ -6,42 +6,83 @@
 
 <div class="publicar-page">
     <div class="page-header">
-        <h1>🐕 Publicar Mascota Encontrada</h1>
-        <p class="lead">Ayúdanos a reunir a las mascotas con sus dueños</p>
+        <h1>🐕 Publicar mascota encontrada</h1>
     </div>
 
     <div class="form-container">
-        <form asp-action="Publicar" method="post" class="mascota-form">
+        <form asp-action="Publicar" method="post" enctype="multipart/form-data" class="mascota-form">
             @Html.AntiForgeryToken()
             
             <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
 
             <div class="form-group">
                 <label asp-for="FotoUrl" class="form-label"></label>
-                <input asp-for="FotoUrl" class="form-control" placeholder="https://ejemplo.com/foto-mascota.jpg" />
+                <input type="file" name="foto" id="foto" class="form-control" accept="image/*" required />
                 <span asp-validation-for="FotoUrl" class="text-danger"></span>
-                <small class="form-text">URL de la imagen de la mascota encontrada</small>
+                <small class="form-text">Seleccione una imagen de la mascota encontrada</small>
             </div>
 
             <div class="form-group">
-                <label asp-for="CalleEncontrada" class="form-label"></label>
-                <input asp-for="CalleEncontrada" class="form-control" placeholder="Ej: Av. Corrientes 1234" />
-                <span asp-validation-for="CalleEncontrada" class="text-danger"></span>
+                <label asp-for="Sexo" class="form-label"></label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" asp-for="Sexo" value="@EncontraTuMascota.Models.Sexo.Masculino" />
+                        Masculino
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" asp-for="Sexo" value="@EncontraTuMascota.Models.Sexo.Femenino" />
+                        Femenino
+                    </label>
+                </div>
+                <span asp-validation-for="Sexo" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label asp-for="Raza" class="form-label"></label>
+                <select asp-for="Raza" class="form-control" asp-items="Html.GetEnumSelectList<EncontraTuMascota.Models.Raza>()">
+                    <option value="">-- Selecciona una raza --</option>
+                </select>
+                <span asp-validation-for="Raza" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Ubicacion" class="form-label"></label>
+                <input asp-for="Ubicacion" class="form-control" 
+                       placeholder="Ej: Av. Corrientes 1234, Buenos Aires" />
+                <span asp-validation-for="Ubicacion" class="text-danger"></span>
+            </div>
+
+            <hr style="margin: 2rem 0; border-color: #ddd;" />
+            
+            <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">📞 Datos de Contacto</h3>
+
+            <div class="form-group">
+                <label asp-for="NombreContacto" class="form-label"></label>
+                <input asp-for="NombreContacto" class="form-control" placeholder="Juan Pérez" />
+                <span asp-validation-for="NombreContacto" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TelefonoContacto" class="form-label"></label>
+                <input asp-for="TelefonoContacto" class="form-control" placeholder="+541112345678" />
+                <span asp-validation-for="TelefonoContacto" class="text-danger"></span>
+                <small class="form-text">Formato: +54 seguido del código de área y número (ej: +541112345678)</small>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="EmailContacto" class="form-label"></label>
+                <input asp-for="EmailContacto" class="form-control" type="email" placeholder="contacto@ejemplo.com" />
+                <span asp-validation-for="EmailContacto" class="text-danger"></span>
+            </div>
+
+            <hr style="margin: 2rem 0; border-color: #ddd;" />
 
             <div class="form-group">
                 <label for="descripcion" class="form-label">Descripción</label>
                 <textarea id="descripcion" name="descripcion" class="form-control" rows="5" 
-                          placeholder="Describe la mascota: color, tamaño, raza, características especiales, etc." 
+                          placeholder="Describe la mascota: color, tamaño, características especiales, etc." 
                           required minlength="10" maxlength="1000"></textarea>
                 <small class="form-text">Mínimo 10 caracteres, máximo 1000</small>
-            </div>
-
-            <div class="form-group">
-                <label for="contacto" class="form-label">Información de Contacto</label>
-                <input id="contacto" name="contacto" type="text" class="form-control" 
-                       placeholder="Teléfono, email u otra forma de contacto" required maxlength="200" />
-                <small class="form-text">Cómo pueden contactarte si reconocen a la mascota</small>
             </div>
 
             <div class="form-actions">
@@ -51,16 +92,6 @@
                 <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>
-    </div>
-
-    <div class="info-box">
-        <h3>💡 Consejos para una mejor publicación</h3>
-        <ul>
-            <li>Incluye una foto clara de la mascota</li>
-            <li>Describe características distintivas (color, tamaño, raza)</li>
-            <li>Indica la ubicación exacta donde la encontraste</li>
-            <li>Proporciona información de contacto válida</li>
-        </ul>
     </div>
 </div>
 
