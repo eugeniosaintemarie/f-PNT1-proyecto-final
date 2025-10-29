@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="15.1">
   <zoom_level>8</zoom_level>
-  
-  <!-- MODELOS -->
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>280</x>
+      <x>328</x>
       <y>120</y>
       <w>240</w>
       <h>240</h>
@@ -18,72 +16,78 @@
 - Sexo: Sexo (enum)
 - Raza: Raza (enum)
 - Ubicacion: string
-- NombreContacto: string
-- TelefonoContacto: string
-- EmailContacto: string
-- FechaPublicacion: DateTime
+- Descripcion: string
+- FechaHallazgo: DateTime
 --
 + Publicaciones: ICollection&lt;Publicacion&gt;
 --
 Validaciones:
 • FotoUrl: Required
-• Sexo, Raza: Required (enums)
+• Sexo, Raza: Required (enum)
 • Ubicacion: Required, MaxLength(200)
-• TelefonoArgentino (custom attribute)</panel_attributes>
+• Descripcion: Required, 10-500 chars</panel_attributes>
     <additional_attributes/>
   </element>
-  
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>80</x>
-      <y>450</y>
+      <x>48</x>
+      <y>424</y>
       <w>260</w>
-      <h>180</h>
+      <h>264</h>
     </coordinates>
     <panel_attributes>*Publicacion*
 --
 - Id: int {PK}
 - MascotaId: int {FK}
+- UsuarioId: int {FK}
 - Descripcion: string
-- Contacto: string
-- Fecha: DateTime
+- Estado: EstadoPublicacion (enum)
+- FechaPublicacion: DateTime
+- FechaCierre: DateTime?
 --
 + Mascota: Mascota (navigation)
++ Usuario: Usuario (navigation)
 --
+Datos contacto (solo autenticados):
+• NombreRescatista: string
+• Telefono: string
+• Email: string
 Validaciones:
 • Descripcion: Required, 10-1000 chars
-• Contacto: Required, MaxLength(200)
-• MascotaId: ForeignKey</panel_attributes>
+• NombreRescatista: Required, 2-100 chars
+• Telefono: TelefonoArgentino (custom)
+• Email: Required, EmailAddress</panel_attributes>
     <additional_attributes/>
   </element>
-  
   <element>
     <id>UMLClass</id>
     <coordinates>
       <x>560</x>
-      <y>450</y>
-      <w>200</w>
-      <h>130</h>
+      <y>544</y>
+      <w>400</w>
+      <h>168</h>
     </coordinates>
     <panel_attributes>*Usuario*
 --
 - Id: int {PK}
-- Nombre: string
+- NombreUsuario: string
 - Email: string
+- PasswordHash: string
+- FechaRegistro: DateTime
+- EsActivo: bool
 --
 Validaciones:
-• Nombre: Required, 2-100 chars
-• Email: Required, EmailAddress
-  MaxLength(150)</panel_attributes>
+• NombreUsuario: Required, Unique, 3-30 chars
+• Email: Required, EmailAddress, Unique, MaxLength(150)
+• PasswordHash: Required (política de contraseña aplicada antes de hashear)
+• EsActivo: true por defecto (soft delete)</panel_attributes>
     <additional_attributes/>
   </element>
-  
-  <!-- ENUMS -->
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>600</x>
+      <x>608</x>
       <y>120</y>
       <w>180</w>
       <h>100</h>
@@ -95,14 +99,13 @@ Masculino
 Femenino</panel_attributes>
     <additional_attributes/>
   </element>
-  
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>600</x>
+      <x>608</x>
       <y>240</y>
       <w>180</w>
-      <h>140</h>
+      <h>164</h>
     </coordinates>
     <panel_attributes>&lt;&lt;enum&gt;&gt;
 *Raza*
@@ -119,12 +122,27 @@ Poodle
 CockerSpaniel</panel_attributes>
     <additional_attributes/>
   </element>
-  
-  <!-- CONTROLLERS -->
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>850</x>
+      <x>352</x>
+      <y>424</y>
+      <w>180</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;enum&gt;&gt;
+*EstadoPublicacion*
+--
+Publicada
+EnProceso
+Cerrada
+Archivada</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>824</x>
       <y>120</y>
       <w>240</w>
       <h>140</h>
@@ -142,58 +160,78 @@ Responsabilidad:
 • Manejo de errores</panel_attributes>
     <additional_attributes/>
   </element>
-  
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>850</x>
-      <y>280</y>
-      <w>280</w>
-      <h>180</h>
+      <x>48</x>
+      <y>712</y>
+      <w>328</w>
+      <h>196</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Controller&gt;&gt;
-*MascotasController*
+*PublicacionesController*
 --
-- _mascotas: List&lt;Mascota&gt;
-- _publicaciones: List&lt;Publicacion&gt;
+- _publicacionesService: IPublicacionesService
+- _autenticacionService: IAutenticacionService
 --
-+ Buscar(termino, sexo, raza, fecha): IActionResult
-+ Publicar(): IActionResult
-+ Publicar(Mascota, Publicacion): IActionResult
++ Index(FiltroPublicacionesViewModel): IActionResult
++ Detalles(int id): IActionResult
++ Crear(): IActionResult
++ Crear(PublicacionViewModel): IActionResult
++ MisPublicaciones(): IActionResult
++ Cerrar(int id): IActionResult
 --
 Responsabilidad:
-• Búsqueda avanzada con filtros LINQ
-• Publicación de mascotas encontradas
-• Carga de datos de prueba</panel_attributes>
+• Exponer listado público sin datos de contacto
+• Revelar contacto cuando el usuario está autenticado
+• Gestionar ciclo de vida de publicaciones creadas por usuarios</panel_attributes>
     <additional_attributes/>
   </element>
-  
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>850</x>
-      <y>480</y>
-      <w>240</w>
-      <h>120</h>
+      <x>1024</x>
+      <y>536</y>
+      <w>320</w>
+      <h>128</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Controller&gt;&gt;
-*AccountController*
+*AutenticacionController*
 --
-+ Login(usuario, password): IActionResult
++ Login(LoginViewModel): IActionResult
 + Logout(): IActionResult
++ RefreshSession(): IActionResult
 --
 Responsabilidad:
-• Autenticación con Session
-• Login/Logout hardcoded
-• (admin/admin)</panel_attributes>
+• Gestionar inicio/cierre de sesión con credenciales persistidas
+• Emitir claims/cookies seguros y controlar expiración
+• Integrarse con políticas de autorización de publicaciones</panel_attributes>
     <additional_attributes/>
   </element>
-  
-  <!-- HELPERS -->
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>50</x>
+      <x>1024</x>
+      <y>672</y>
+      <w>324</w>
+      <h>116</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Controller&gt;&gt;
+*RegistroController*
+--
++ Registrar(): IActionResult
++ Registrar(RegistroViewModel): IActionResult
+--
+Responsabilidad:
+• Validar unicidad de nombre de usuario y email
+• Aplicar políticas de contraseña y confirmación
+• Crear usuario activo y redirigir a experiencia autenticada</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>48</x>
       <y>120</y>
       <w>200</w>
       <h>100</h>
@@ -209,11 +247,10 @@ Genera 10 mascotas de
 prueba con imágenes Unsplash</panel_attributes>
     <additional_attributes/>
   </element>
-  
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>50</x>
+      <x>48</x>
       <y>240</y>
       <w>200</w>
       <h>80</h>
@@ -226,12 +263,11 @@ prueba con imágenes Unsplash</panel_attributes>
 Valida formato +54...</panel_attributes>
     <additional_attributes/>
   </element>
-  
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>50</x>
-      <y>340</y>
+      <x>48</x>
+      <y>328</y>
       <w>200</w>
       <h>70</h>
     </coordinates>
@@ -242,87 +278,153 @@ Constantes de mensajes
 del sistema</panel_attributes>
     <additional_attributes/>
   </element>
-  
-  <!-- RELACIONES -->
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>320</x>
+      <x>296</x>
       <y>352</y>
-      <w>80</w>
-      <h>120</h>
+      <w>56</w>
+      <h>88</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
 m2=0..*
 tiene</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;130.0</additional_attributes>
+    <additional_attributes>40.0;10.0;10.0;90.0</additional_attributes>
   </element>
-  
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>512</x>
-      <y>180</y>
-      <w>104</w>
+      <x>296</x>
+      <y>560</y>
+      <w>280</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>lt=&lt;-
-usa</panel_attributes>
-    <additional_attributes>110.0;20.0;10.0;20.0</additional_attributes>
+    <panel_attributes>lt=-
+m1=1
+m2=0..*
+propietario</panel_attributes>
+    <additional_attributes>330.0;20.0;10.0;20.0</additional_attributes>
   </element>
-  
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>512</x>
-      <y>260</y>
-      <w>104</w>
-      <h>40</h>
+      <x>560</x>
+      <y>160</y>
+      <w>64</w>
+      <h>32</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 usa</panel_attributes>
-    <additional_attributes>110.0;20.0;10.0;20.0</additional_attributes>
+    <additional_attributes>60.0;20.0;10.0;20.0</additional_attributes>
   </element>
-  
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>560</x>
+      <y>240</y>
+      <w>64</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+usa</panel_attributes>
+    <additional_attributes>60.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>296</x>
+      <y>456</y>
+      <w>72</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+usa</panel_attributes>
+    <additional_attributes>70.0;20.0;10.0;20.0</additional_attributes>
+  </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>240</x>
-      <y>180</y>
-      <w>56</w>
-      <h>40</h>
+      <y>144</y>
+      <w>104</w>
+      <h>32</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 genera</panel_attributes>
-    <additional_attributes>10.0;20.0;50.0;20.0</additional_attributes>
+    <additional_attributes>10.0;20.0;110.0;20.0</additional_attributes>
   </element>
-  
-  <!-- NOTAS -->
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>16</x>
+      <y>272</y>
+      <w>56</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+valida</panel_attributes>
+    <additional_attributes>40.0;230.0;10.0;230.0;10.0;10.0;40.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>96</x>
+      <y>680</y>
+      <w>40</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+usa</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>952</x>
+      <y>560</y>
+      <w>88</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+gestiona</panel_attributes>
+    <additional_attributes>10.0;20.0;90.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>952</x>
+      <y>648</y>
+      <w>88</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+crea</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;80.0</additional_attributes>
+  </element>
   <element>
     <id>UMLNote</id>
     <coordinates>
       <x>560</x>
-      <y>20</y>
+      <y>16</y>
       <w>300</w>
-      <h>80</h>
+      <h>88</h>
     </coordinates>
     <panel_attributes>*Estado Actual del Proyecto*
 --
-✅ MVC completo con 3 controllers
-✅ Autenticación con Session
-✅ Búsqueda avanzada con LINQ
-✅ 10 mascotas de prueba
-✅ Validaciones con Data Annotations
+✅ MVC con Publicaciones, Autenticación y Registro
+✅ Flujo público sin exponer datos de contacto
+✅ Gestión autenticada de publicaciones y cierre de casos
+✅ Validaciones de registro, contacto y teléfono argentino
+✅ Datos de prueba opcionales para demostraciones
 bg=yellow</panel_attributes>
     <additional_attributes/>
   </element>
-  
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>900</x>
-      <y>20</y>
+      <x>864</x>
+      <y>16</y>
       <w>200</w>
       <h>80</h>
     </coordinates>
@@ -335,12 +437,11 @@ bg=yellow</panel_attributes>
 bg=orange</panel_attributes>
     <additional_attributes/>
   </element>
-  
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>50</x>
-      <y>20</y>
+      <x>48</x>
+      <y>16</y>
       <w>280</w>
       <h>80</h>
     </coordinates>
@@ -353,5 +454,4 @@ bg=orange</panel_attributes>
 bg=blue</panel_attributes>
     <additional_attributes/>
   </element>
-  
 </diagram>
