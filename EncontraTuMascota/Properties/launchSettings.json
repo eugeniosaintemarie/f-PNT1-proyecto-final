@@ -1,7 +1,12 @@
 {
   "profiles": {
     "EncontraTuMascota": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "http://127.0.0.1:5005",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     },
     "Container (Dockerfile)": {
       "commandName": "Docker"

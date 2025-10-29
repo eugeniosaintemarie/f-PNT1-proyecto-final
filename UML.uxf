@@ -1,126 +1,357 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="15.1">
-  <zoom_level>10</zoom_level>
+  <zoom_level>8</zoom_level>
+  
+  <!-- MODELOS -->
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>290</x>
-      <y>110</y>
-      <w>200</w>
-      <h>160</h>
+      <x>280</x>
+      <y>120</y>
+      <w>240</w>
+      <h>240</h>
     </coordinates>
-    <panel_attributes>Mascota
+    <panel_attributes>*Mascota*
 --
-- id: int {PK}
-- fotoUrl: string
-- calleEncontrada: string
-- fechaPublicacion: DateTime
+- Id: int {PK}
+- FotoUrl: string
+- Sexo: Sexo (enum)
+- Raza: Raza (enum)
+- Ubicacion: string
+- NombreContacto: string
+- TelefonoContacto: string
+- EmailContacto: string
+- FechaPublicacion: DateTime
 --
-+ getId(): int
-+ setId(id: int): void
-+ getFotoUrl(): string
-+ setFotoUrl(url: string): void</panel_attributes>
++ Publicaciones: ICollection&lt;Publicacion&gt;
+--
+Validaciones:
+• FotoUrl: Required
+• Sexo, Raza: Required (enums)
+• Ubicacion: Required, MaxLength(200)
+• TelefonoArgentino (custom attribute)</panel_attributes>
     <additional_attributes/>
   </element>
+  
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>120</x>
-      <y>350</y>
-      <w>230</w>
+      <x>80</x>
+      <y>450</y>
+      <w>260</w>
       <h>180</h>
     </coordinates>
-    <panel_attributes>Publicacion
+    <panel_attributes>*Publicacion*
 --
-- id: int {PK}
-- mascotaId: int {FK}
-- descripcion: string
-- contacto: string
-- fecha: DateTime
+- Id: int {PK}
+- MascotaId: int {FK}
+- Descripcion: string
+- Contacto: string
+- Fecha: DateTime
 --
-+ getId(): int
-+ setId(id: int): void
-+ getDescripcion(): string
-+ setDescripcion(desc: string): void</panel_attributes>
++ Mascota: Mascota (navigation)
+--
+Validaciones:
+• Descripcion: Required, 10-1000 chars
+• Contacto: Required, MaxLength(200)
+• MascotaId: ForeignKey</panel_attributes>
     <additional_attributes/>
   </element>
+  
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>500</x>
-      <y>350</y>
-      <w>220</w>
-      <h>150</h>
+      <x>560</x>
+      <y>450</y>
+      <w>200</w>
+      <h>130</h>
     </coordinates>
-    <panel_attributes>Usuario
+    <panel_attributes>*Usuario*
 --
-- id: int {PK}
-- nombre: string
-- email: string
+- Id: int {PK}
+- Nombre: string
+- Email: string
 --
-+ getId(): int
-+ setId(id: int): void
-+ getNombre(): string
-+ setNombre(nombre: string): void</panel_attributes>
+Validaciones:
+• Nombre: Required, 2-100 chars
+• Email: Required, EmailAddress
+  MaxLength(150)</panel_attributes>
     <additional_attributes/>
   </element>
+  
+  <!-- ENUMS -->
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>600</x>
+      <y>120</y>
+      <w>180</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;enum&gt;&gt;
+*Sexo*
+--
+Masculino
+Femenino</panel_attributes>
+    <additional_attributes/>
+  </element>
+  
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>600</x>
+      <y>240</y>
+      <w>180</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;enum&gt;&gt;
+*Raza*
+--
+Labrador
+GoldenRetriever
+PastorAleman
+Bulldog
+Beagle
+Chihuahua
+YorkshireTerrier
+HuskySiberiano
+Poodle
+CockerSpaniel</panel_attributes>
+    <additional_attributes/>
+  </element>
+  
+  <!-- CONTROLLERS -->
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>850</x>
+      <y>120</y>
+      <w>240</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Controller&gt;&gt;
+*HomeController*
+--
++ Index(): IActionResult
++ Privacy(): IActionResult
++ Error(): IActionResult
+--
+Responsabilidad:
+• Página principal
+• Páginas estáticas
+• Manejo de errores</panel_attributes>
+    <additional_attributes/>
+  </element>
+  
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>850</x>
+      <y>280</y>
+      <w>280</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Controller&gt;&gt;
+*MascotasController*
+--
+- _mascotas: List&lt;Mascota&gt;
+- _publicaciones: List&lt;Publicacion&gt;
+--
++ Buscar(termino, sexo, raza, fecha): IActionResult
++ Publicar(): IActionResult
++ Publicar(Mascota, Publicacion): IActionResult
+--
+Responsabilidad:
+• Búsqueda avanzada con filtros LINQ
+• Publicación de mascotas encontradas
+• Carga de datos de prueba</panel_attributes>
+    <additional_attributes/>
+  </element>
+  
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>850</x>
+      <y>480</y>
+      <w>240</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Controller&gt;&gt;
+*AccountController*
+--
++ Login(usuario, password): IActionResult
++ Logout(): IActionResult
+--
+Responsabilidad:
+• Autenticación con Session
+• Login/Logout hardcoded
+• (admin/admin)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  
+  <!-- HELPERS -->
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>50</x>
+      <y>120</y>
+      <w>200</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Helper&gt;&gt;
+*DatosDePrueba*
+--
++ USAR_DATOS_DE_PRUEBA: bool
+--
++ CargarDatosDePrueba(): void
+--
+Genera 10 mascotas de
+prueba con imágenes Unsplash</panel_attributes>
+    <additional_attributes/>
+  </element>
+  
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>50</x>
+      <y>240</y>
+      <w>200</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Attribute&gt;&gt;
+*TelefonoArgentinoAttribute*
+--
++ IsValid(): bool
+--
+Valida formato +54...</panel_attributes>
+    <additional_attributes/>
+  </element>
+  
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>50</x>
+      <y>340</y>
+      <w>200</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Helper&gt;&gt;
+*Messages*
+--
+Constantes de mensajes
+del sistema</panel_attributes>
+    <additional_attributes/>
+  </element>
+  
+  <!-- RELACIONES -->
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>330</x>
-      <y>260</y>
-      <w>110</w>
-      <h>110</h>
+      <x>320</x>
+      <y>352</y>
+      <w>80</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
-m2=1
-se asocia con</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+m2=0..*
+tiene</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;130.0</additional_attributes>
   </element>
+  
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>340</x>
-      <y>380</y>
-      <w>180</w>
-      <h>50</h>
+      <x>512</x>
+      <y>180</y>
+      <w>104</w>
+      <h>40</h>
     </coordinates>
-    <panel_attributes>lt=-
-m1=0..*
-m2=1
-hace</panel_attributes>
-    <additional_attributes>10.0;20.0;160.0;20.0</additional_attributes>
+    <panel_attributes>lt=&lt;-
+usa</panel_attributes>
+    <additional_attributes>110.0;20.0;10.0;20.0</additional_attributes>
   </element>
+  
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>512</x>
+      <y>260</y>
+      <w>104</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+usa</panel_attributes>
+    <additional_attributes>110.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>180</y>
+      <w>56</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+genera</panel_attributes>
+    <additional_attributes>10.0;20.0;50.0;20.0</additional_attributes>
+  </element>
+  
+  <!-- NOTAS -->
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>20</x>
+      <x>560</x>
       <y>20</y>
-      <w>240</w>
-      <h>110</h>
+      <w>300</w>
+      <h>80</h>
     </coordinates>
-    <panel_attributes>Entidades Fuertes:
-- Mascota (base de la app)
-
-Entidades Débiles:
-- Publicación (depende de Mascota)
-- Usuario (futuro, para login)
+    <panel_attributes>*Estado Actual del Proyecto*
+--
+✅ MVC completo con 3 controllers
+✅ Autenticación con Session
+✅ Búsqueda avanzada con LINQ
+✅ 10 mascotas de prueba
+✅ Validaciones con Data Annotations
 bg=yellow</panel_attributes>
     <additional_attributes/>
   </element>
+  
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>520</x>
-      <y>70</y>
+      <x>900</x>
+      <y>20</y>
       <w>200</w>
-      <h>60</h>
+      <h>80</h>
     </coordinates>
-    <panel_attributes>Cardinalidades:
-- Usuario → Publicación (1:N)
-- Publicación → Mascota (1:1)
+    <panel_attributes>*Pendientes*
+--
+⏳ Entity Framework Core
+⏳ ASP.NET Identity
+⏳ Roles/Autorización
+⏳ Herencia en modelos
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>50</x>
+      <y>20</y>
+      <w>280</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>*Arquitectura*
+--
+• Patrón MVC (Model-View-Controller)
+• Inyección de dependencias (Session, Singleton)
+• Material Design UI con CSS custom
+• Helpers para validaciones y datos de prueba
 bg=blue</panel_attributes>
     <additional_attributes/>
   </element>
+  
 </diagram>

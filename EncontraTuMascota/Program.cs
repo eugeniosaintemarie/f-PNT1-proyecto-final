@@ -1,5 +1,25 @@
 ﻿// Configuración inicial del proyecto ASP.NET Core MVC
-var builder = WebApplication.CreateBuilder(args);
+
+// Fix para WebRootPath cuando se ejecuta desde bin/Debug
+var currentDir = Directory.GetCurrentDirectory();
+string contentRoot = currentDir;
+string webRoot = Path.Combine(currentDir, "wwwroot");
+
+if (currentDir.Contains("bin"))
+{
+    // Navegar hacia arriba para encontrar el directorio del proyecto
+    contentRoot = Path.GetFullPath(Path.Combine(currentDir, "..", "..", ".."));
+    webRoot = Path.Combine(contentRoot, "wwwroot");
+}
+
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = contentRoot,
+    WebRootPath = webRoot
+});
+
+builder.WebHost.UseUrls("http://127.0.0.1:5006");
 
 // Agregamos soporte para Controllers y Views (MVC)
 builder.Services.AddControllersWithViews();
@@ -19,18 +39,14 @@ var app = builder.Build();
 // (el orden importa, no lo cambies a lo loco)
 if (!app.Environment.IsDevelopment())
 {
-    // Si estamos en producción, usamos páginas de error custom
+  // Si estamos en producción, usamos páginas de error custom
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
 
-// Redirección automática a HTTPS (por seguridad)
-app.UseHttpsRedirection();
-
-// Habilita archivos estáticos (CSS, JS, imágenes, etc. de wwwroot)
+// No redirección a HTTPS en Development
 app.UseStaticFiles();
-
-// Habilita el routing
 app.UseRouting();
 
 // Habilita sesiones (tiene que ir antes de UseAuthorization)
