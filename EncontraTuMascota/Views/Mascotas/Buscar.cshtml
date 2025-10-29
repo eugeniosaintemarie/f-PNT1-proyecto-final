@@ -8,7 +8,7 @@
 
 @* 
     Acá es donde buscás mascotas perdidas.
-    Podés filtrar por ubicación o ver todas las que hay publicadas.
+    Podés filtrar por ubicación, sexo, raza y fecha. Los filtros se combinan para afinar la búsqueda.
 *@
 <div class="buscar-page">
     <div class="page-header">
@@ -23,15 +23,80 @@
         </div>
     }
 
-    @* Formulario de búsqueda por ubicación *@
+    @* Formulario de búsqueda con filtros *@
     <div class="search-section">
         <form method="get" asp-action="Buscar" class="search-form">
-            <div class="search-group">
-                <input type="text" name="termino" value="@ViewBag.Termino" 
-                       class="search-input" placeholder="Buscar por calle o ubicación" />
-                <button type="submit" class="btn btn-search">
-                    <span>🔎</span> Buscar
-                </button>
+            @* Todos los filtros juntos en una caja *@
+            <div class="filters-section">
+                <div class="filters-group">
+                    @* Primera línea: Ubicación (50%) y Fecha (20%) *@
+                    <div class="filter-row">
+                        <div class="filter-item filter-ubicacion">
+                            <label for="termino" class="filter-label">📍 Ubicación:</label>
+                            <input type="text" name="termino" id="termino" value="@ViewBag.Termino" 
+                                   class="filter-input" placeholder="Buscar por calle o barrio" />
+                        </div>
+
+                        <div class="filter-item filter-fecha">
+                            <label for="fechaDesde" class="filter-label">📅 Desde:</label>
+                            <input type="date" name="fechaDesde" id="fechaDesde" value="@ViewBag.FechaDesde" 
+                                   class="filter-input" placeholder="DD/MM/AA" />
+                        </div>
+                    </div>
+
+                    @* Segunda línea: Sexo (con checkboxes inline), Raza (con selector inline) y Botones *@
+                    <div class="filter-row filter-row-inline">
+                        <div class="filter-group-inline">
+                            <label class="filter-label-inline">♀️♂️ Sexo:</label>
+                            <div class="checkbox-group-horizontal">
+                                @{
+                                    var sexoMasculino = ViewBag.SexoMasculino as bool? ?? false;
+                                    var sexoFemenino = ViewBag.SexoFemenino as bool? ?? false;
+                                }
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="sexoMasculino" value="true" checked="@sexoMasculino" id="sexoMasculino" />
+                                    Masculino
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="sexoFemenino" value="true" checked="@sexoFemenino" id="sexoFemenino" />
+                                    Femenino
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="filter-group-inline">
+                            <label for="raza" class="filter-label-inline">🐕 Raza:</label>
+                            <select name="raza" id="raza" class="filter-select-inline">
+                                <option value="">Todas</option>
+                                @{
+                                    var razaSeleccionada = ViewBag.RazaSeleccionada as int?;
+                                }
+                                @foreach (var razaEnum in Enum.GetValues<EncontraTuMascota.Models.Raza>())
+                                {
+                                    var razaValor = (int)razaEnum;
+                                    var isSelected = razaSeleccionada == razaValor;
+                                    var displayName = razaEnum.ToString()
+                                        .Replace("GoldenRetriever", "Golden Retriever")
+                                        .Replace("PastorAleman", "Pastor Alemán")
+                                        .Replace("YorkshireTerrier", "Yorkshire Terrier")
+                                        .Replace("HuskySiberiano", "Husky Siberiano")
+                                        .Replace("CockerSpaniel", "Cocker Spaniel");
+                                    
+                                    <option value="@razaValor" selected="@isSelected">@displayName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="filter-actions-inline">
+                            <button type="submit" class="btn btn-primary btn-search">
+                                <span>🔎</span> Buscar
+                            </button>
+                            <a asp-action="Buscar" class="btn btn-secondary btn-clear">
+                                🧹 Limpiar
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
@@ -41,7 +106,7 @@
         @if (Model != null && Model.Any())
         {
             @* Si hay resultados, los mostramos en cards *@
-            <h2>Mascotas Encontradas (@Model.Count)</h2>
+            <h2>Mascotas encontradas (@Model.Count)</h2>
             <div class="mascotas-grid">
                 @foreach (var mascota in Model)
                 {
@@ -63,18 +128,20 @@
                         
                         @* Info de la mascota *@
                         <div class="mascota-info">
-                            <h3>Encontrada en: @mascota.Ubicacion</h3>
+                            <h3>@mascota.Ubicacion</h3>
                             <p class="mascota-details">
-                                <strong>Sexo:</strong> @mascota.Sexo.ToString() <br />
+                                <span class="detail-item"><strong>Sexo:</strong> @mascota.Sexo.ToString()</span>
                                 @* Acá reemplazamos los nombres de enum por los nombres bonitos *@
-                                <strong>Raza:</strong> @mascota.Raza.ToString().Replace("GoldenRetriever", "Golden Retriever")
-                                    .Replace("PastorAleman", "Pastor Alemán")
-                                    .Replace("YorkshireTerrier", "Yorkshire Terrier")
-                                    .Replace("HuskySiberiano", "Husky Siberiano")
-                                    .Replace("CockerSpaniel", "Cocker Spaniel")
-                            </p>
-                            <p class="fecha">
-                                <strong>Fecha:</strong> @mascota.FechaPublicacion.ToString("dd/MM/yyyy HH:mm")
+                                <span class="detail-item"><strong>Raza:</strong> @{
+                                    var razaDisplay = mascota.Raza.ToString()
+                                        .Replace("GoldenRetriever", "Golden Retriever")
+                                        .Replace("PastorAleman", "Pastor Alemán")
+                                        .Replace("YorkshireTerrier", "Yorkshire Terrier")
+                                        .Replace("HuskySiberiano", "Husky Siberiano")
+                                        .Replace("CockerSpaniel", "Cocker Spaniel");
+                                }
+                                @razaDisplay</span>
+                                <span class="detail-item"><strong>Fecha:</strong> @mascota.FechaPublicacion.ToString("dd")/@mascota.FechaPublicacion.ToString("MM")/'@mascota.FechaPublicacion.ToString("yy")</span>
                             </p>
                             
                             @* Si hay publicación, mostramos descripción y contacto *@
@@ -83,9 +150,23 @@
                                 <p class="descripcion">@publicacion.Descripcion</p>
                                 <div class="contacto-box">
                                     <strong>📞 Contacto:</strong><br />
-                                    <strong>Nombre:</strong> @mascota.NombreContacto<br />
-                                    <strong>Teléfono:</strong> @mascota.TelefonoContacto<br />
-                                    <strong>Email:</strong> @mascota.EmailContacto
+                                    @if (Context.Session.GetString("Usuario") != null)
+                                    {
+                                        @* Usuario logueado: mostrar datos sin blur *@
+                                        <strong>Nombre:</strong> @mascota.NombreContacto<br />
+                                        <strong>Teléfono:</strong> @mascota.TelefonoContacto<br />
+                                        <strong>Email:</strong> @mascota.EmailContacto
+                                    }
+                                    else
+                                    {
+                                        @* Usuario no logueado: mostrar con blur *@
+                                        <strong>Nombre:</strong> <span class="contacto-blur">@mascota.NombreContacto</span><br />
+                                        <strong>Teléfono:</strong> <span class="contacto-blur">@mascota.TelefonoContacto</span><br />
+                                        <strong>Email:</strong> <span class="contacto-blur">@mascota.EmailContacto</span>
+                                        <div class="login-prompt">
+                                            <p>🔒 <a href="#" onclick="mostrarLogin(); return false;">Iniciá sesión</a> para ver los datos de contacto</p>
+                                        </div>
+                                    }
                                 </div>
                             }
                         </div>
@@ -111,3 +192,36 @@
         }
     </div>
 </div>
+
+<script>
+    // Hacer que los checkboxes de sexo sean mutuamente exclusivos
+    document.addEventListener('DOMContentLoaded', function() {
+        const sexoMasculino = document.getElementById('sexoMasculino');
+        const sexoFemenino = document.getElementById('sexoFemenino');
+        
+        if (sexoMasculino && sexoFemenino) {
+            sexoMasculino.addEventListener('change', function() {
+                if (this.checked) {
+                    sexoFemenino.checked = false;
+                }
+            });
+            
+            sexoFemenino.addEventListener('change', function() {
+                if (this.checked) {
+                    sexoMasculino.checked = false;
+                }
+            });
+        }
+        
+        // Hacer que todo el input de fecha abra el calendario
+        const fechaInput = document.getElementById('fechaDesde');
+        if (fechaInput) {
+            fechaInput.addEventListener('click', function(e) {
+                // Si no se hizo click en el icono del calendario, lo abrimos programáticamente
+                if (e.target === this) {
+                    this.showPicker();
+                }
+            });
+        }
+    });
+</script>

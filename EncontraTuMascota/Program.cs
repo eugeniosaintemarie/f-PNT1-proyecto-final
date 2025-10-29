@@ -4,6 +4,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Agregamos soporte para Controllers y Views (MVC)
 builder.Services.AddControllersWithViews();
 
+// Habilitamos sesiones para el sistema de login
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // La sesión dura 30 minutos
+    options.Cookie.HttpOnly = true; // Por seguridad
+    options.Cookie.IsEssential = true; // Necesario para GDPR
+});
+
 var app = builder.Build();
 
 // Configuración del pipeline de requests HTTP
@@ -23,6 +32,9 @@ app.UseStaticFiles();
 
 // Habilita el routing
 app.UseRouting();
+
+// Habilita sesiones (tiene que ir antes de UseAuthorization)
+app.UseSession();
 
 // Habilita autorización (por ahora no lo usamos pero va a venir bien después)
 app.UseAuthorization();

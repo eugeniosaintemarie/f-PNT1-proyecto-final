@@ -27,7 +27,6 @@
                 <label asp-for="FotoUrl" class="form-label"></label>
                 <input type="file" name="foto" id="foto" class="form-control" accept="image/*" required />
                 <span asp-validation-for="FotoUrl" class="text-danger"></span>
-                <small class="form-text">Seleccione una imagen de la mascota encontrada</small>
             </div>
 
             @* Sexo: Masculino o Femenino (radio buttons) *@
@@ -50,7 +49,7 @@
             <div class="form-group">
                 <label asp-for="Raza" class="form-label"></label>
                 <select asp-for="Raza" class="form-control" asp-items="Html.GetEnumSelectList<EncontraTuMascota.Models.Raza>()">
-                    <option value="">-- Selecciona una raza --</option>
+                    <option value="">Selecciona una raza</option>
                 </select>
                 <span asp-validation-for="Raza" class="text-danger"></span>
             </div>
@@ -59,13 +58,13 @@
             <div class="form-group">
                 <label asp-for="Ubicacion" class="form-label"></label>
                 <input asp-for="Ubicacion" class="form-control" 
-                       placeholder="Ej: Av. Corrientes 1234, Buenos Aires" />
+                       placeholder="Ejemplo: Av. Corrientes 1234, Buenos Aires" />
                 <span asp-validation-for="Ubicacion" class="text-danger"></span>
             </div>
 
             <hr style="margin: 2rem 0; border-color: #ddd;" />
             
-            <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">📞 Datos de Contacto</h3>
+            <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">📞 Datos de contacto</h3>
 
             @* Tu nombre para que te puedan contactar *@
             <div class="form-group">
@@ -79,7 +78,7 @@
                 <label asp-for="TelefonoContacto" class="form-label"></label>
                 <input asp-for="TelefonoContacto" class="form-control" placeholder="+541112345678" />
                 <span asp-validation-for="TelefonoContacto" class="text-danger"></span>
-                <small class="form-text">Formato: +54 seguido del código de área y número (ej: +541112345678)</small>
+                <!--<small class="form-text">Formato: +54 seguido del código de área y número (ej: +541112345678)</small>-->
             </div>
 
             @* Email de contacto *@
@@ -95,9 +94,9 @@
             <div class="form-group">
                 <label for="descripcion" class="form-label">Descripción</label>
                 <textarea id="descripcion" name="descripcion" class="form-control" rows="5" 
-                          placeholder="Describe la mascota: color, tamaño, características especiales, etc." 
+                          placeholder="Describi la mascota: color, tamaño, características especiales, etc." 
                           required minlength="10" maxlength="1000"></textarea>
-                <small class="form-text">Mínimo 10 caracteres, máximo 1000</small>
+                <!--<small class="form-text">Mínimo 10 caracteres, máximo 1000</small>-->
             </div>
 
             @* Botones de acción *@

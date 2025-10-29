@@ -1,20 +1,14 @@
-/* Estilos generales - Material Design con naranja */
 :root {
-    /* Material Design Orange Palette */
-    --primary-color: #FF6F00; /* Orange 900 */
-    --primary-light: #FF8F00; /* Orange 800 */
-    --primary-dark: #E65100; /* Orange 900 dark */
-    --accent-color: #FFA726; /* Orange 400 */
-    --accent-light: #FFB74D; /* Orange 300 */
-    
-    /* Grises Material Design */
+    --primary-color: #FF6F00;
+    --primary-light: #FF8F00;
+    --primary-dark: #E65100;
+    --accent-color: #FFA726;
+    --accent-light: #FFB74D;
     --text-primary: #212121;
     --text-secondary: #757575;
     --divider: #BDBDBD;
     --background: #FAFAFA;
     --surface: #FFFFFF;
-    
-    /* Shadows Material Design */
     --shadow-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     --shadow-2: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     --shadow-3: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
@@ -40,7 +34,6 @@ body {
     background-color: var(--background);
 }
 
-/* Wrapper para sticky footer */
 .site-wrapper {
     display: flex;
     flex-direction: column;
@@ -48,7 +41,8 @@ body {
 }
 
 .main-content {
-    flex: 1;
+    flex: 1 0 auto;
+    padding-bottom: 2rem;
 }
 
 .container {
@@ -57,7 +51,6 @@ body {
     padding: 0 20px;
 }
 
-/* Navbar - Material Design */
 .navbar {
     background-color: var(--primary-color);
     padding: 0;
@@ -72,6 +65,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
+    gap: 2rem;
 }
 
 .navbar-brand {
@@ -83,6 +77,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-shrink: 0;
 }
 
 .navbar-brand:hover {
@@ -100,9 +95,19 @@ body {
     gap: 8px;
     margin: 0;
     padding: 0;
+    flex: 1;
+    justify-content: center;
 }
 
-.nav-menu li a {
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li a {
     color: white;
     text-decoration: none;
     font-weight: 500;
@@ -112,8 +117,38 @@ body {
     display: block;
 }
 
-.nav-menu li a:hover {
+.nav-links li a:hover {
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Botones de autenticación en navbar */
+.auth-buttons {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+}
+
+.usuario-logueado {
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem;
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-outline:hover {
+    background-color: white;
+    color: var(--primary-color);
 }
 
 /* Hero Section - Material Design */
@@ -234,14 +269,11 @@ body {
     background-color: var(--text-primary);
     color: white;
     text-align: center;
-    padding: 2rem 0;
+    padding: 1.5rem 0;
     margin-top: auto;
     box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
     width: 100%;
-}
-
-html {
-    background-color: var(--text-primary);
+    flex-shrink: 0;
 }
 
 /* Responsive */
@@ -373,7 +405,8 @@ html {
 }
 
 .btn-primary:hover {
-    background-color: var(--primary-dark);
+    background-color: white;
+    color: var(--primary-color);
     box-shadow: var(--shadow-2);
 }
 
@@ -435,27 +468,333 @@ html {
 }
 
 .search-form {
-    max-width: 600px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 
-.search-group {
+/* Filtros - todos juntos en una caja */
+.filters-section {
+    background: var(--surface);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-1);
+}
+
+.filters-group {
     display: flex;
+    flex-direction: column;
     gap: 1rem;
 }
 
-.search-input {
-    flex: 1;
-    padding: 0.75rem;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
+.filter-row {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
 }
 
-.search-input:focus {
+.filter-row-inline {
+    align-items: center;
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-ubicacion {
+    flex: 1;
+}
+
+.filter-fecha {
+    flex: 0 0 200px;
+}
+
+.filter-item-full {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.filter-group-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.filter-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.filter-label-inline {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.filter-input,
+.filter-select {
+    padding: 0.6rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    background-color: var(--surface);
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+/* Asegurar que el input date tenga la misma altura que el input text */
+input[type="date"].filter-input {
+    height: 40px;
+    padding: 0.6rem;
+    display: flex;
+    align-items: center;
+    cursor: pointer; /* Todo el input es clickeable */
+}
+
+input[type="text"].filter-input {
+    height: 40px;
+}
+
+/* Alinear el icono del calendario */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    margin-left: auto;
+    pointer-events: auto; /* El icono también es clickeable */
+}
+
+/* Hacer que todo el input abra el calendario */
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    cursor: pointer;
+}
+
+/* Placeholder para input de tipo date */
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+    color: transparent;
+}
+
+input[type="date"]:focus::-webkit-datetime-edit-text,
+input[type="date"]:focus::-webkit-datetime-edit-month-field,
+input[type="date"]:focus::-webkit-datetime-edit-day-field,
+input[type="date"]:focus::-webkit-datetime-edit-year-field {
+    color: inherit;
+}
+
+input[type="date"]:not(:focus):invalid {
+    color: #999;
+}
+
+input[type="date"]::before {
+    content: attr(placeholder);
+    color: #999;
+    margin-right: 0.5rem;
+}
+
+input[type="date"]:focus::before,
+input[type="date"]:valid::before {
+    content: "";
+}
+
+.filter-select {
+    cursor: pointer;
+}
+
+.filter-select-inline {
+    padding: 0.6rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    background-color: var(--surface);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-width: 200px;
+}
+
+.filter-input:focus,
+.filter-select:focus,
+.filter-select-inline:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(255, 111, 0, 0.1);
+}
+
+.filter-select:hover,
+.filter-select-inline:hover {
+    border-color: var(--accent-color);
+}
+
+/* Checkboxes para el sexo - horizontal */
+.checkbox-group-horizontal {
+    display: flex;
+    gap: 0.3rem;
+}
+
+.checkbox-group {
+    display: flex;
+    gap: 2rem;
+    margin-top: 0.3rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-weight: normal;
+    color: var(--text-secondary);
+    transition: opacity 0.3s ease;
+}
+
+/* Solo aplicar opacidad cuando HAY al menos un checkbox seleccionado */
+.checkbox-group-horizontal:has(input[type="checkbox"]:checked) .checkbox-label:has(input[type="checkbox"]:not(:checked)) {
+    opacity: 0.4;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.filter-actions-inline {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-left: auto;
+}
+
+.filter-actions-right {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-left: auto;
+}
+
+.btn-search,
+.btn-clear {
+    padding: 0.6rem 1.5rem;
+    border-radius: 5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-search {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.btn-search:hover {
+    background-color: var(--primary-dark);
+    color: white !important; /* Mantener el texto blanco en hover */
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2);
+}
+
+.btn-clear {
+    background-color: #f5f5f5;
+    color: var(--text-secondary);
+    border: 2px solid #ddd;
+    text-decoration: none;
+}
+
+.btn-clear:hover {
+    background-color: #e0e0e0;
+    border-color: #bbb;
+}
+
+/* Selector de raza en línea */
+.filter-select-inline {
+    white-space: nowrap;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}
+
+.filter-select-inline {
+    padding: 0.5rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    background-color: var(--surface);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+}
+
+.filter-select-inline:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(255, 111, 0, 0.1);
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+/* Responsive para filtros en mobile */
+@media (max-width: 768px) {
+    .filter-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .filter-row-inline {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .filter-ubicacion,
+    .filter-fecha {
+        flex: 1 1 100%;
+    }
+    
+    .filter-group-inline {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+    
+    .filter-select-inline {
+        width: 100%;
+    }
+    
+    .filter-actions-right {
+        flex-direction: column;
+        width: 100%;
+        margin-left: 0;
+    }
+    
+    .btn-search,
+    .btn-clear {
+        width: 100%;
+    }
 }
 
 .results-section {
@@ -479,6 +818,8 @@ html {
     box-shadow: var(--shadow-1);
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
 }
 
 .mascota-card:hover {
@@ -494,6 +835,7 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .mascota-image img {
@@ -509,6 +851,9 @@ html {
 
 .mascota-info {
     padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .mascota-info h3 {
@@ -528,6 +873,7 @@ html {
     color: var(--text-primary);
     margin-bottom: 1rem;
     line-height: 1.5;
+    flex: 1;
 }
 
 .mascota-info .contacto {
@@ -547,12 +893,55 @@ html {
     font-size: 0.95rem;
     line-height: 1.8;
     border-left: 3px solid var(--primary-color);
+    position: relative;
+    margin-top: auto;
+}
+
+/* Blur en datos de contacto - requiere login */
+.contacto-blur {
+    filter: blur(5px);
+    user-select: none;
+    pointer-events: none;
+}
+
+.login-prompt {
+    text-align: center;
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--accent-light);
+}
+
+.login-prompt p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.login-prompt a {
+    color: var(--primary-color);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.login-prompt a:hover {
+    text-decoration: underline;
 }
 
 .mascota-details {
     color: #666;
     margin-bottom: 0.5rem;
-    line-height: 1.8;
+    line-height: 1.4;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    row-gap: 0.2rem;
+    min-height: 2.8rem; /* Altura mínima fija para 2 líneas (1.4 * 2) */
+    align-content: flex-start; /* Alinea el contenido arriba */
+}
+
+/* Cada item (título + valor) se mantiene junto */
+.mascota-details .detail-item {
+    white-space: nowrap; /* No rompe el span */
 }
 
 /* Radio buttons */
@@ -648,3 +1037,229 @@ html {
         grid-template-columns: 1fr;
     }
 }
+
+/* Botones de autenticación - en el navbar */
+.auth-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-auth {
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-auth:hover {
+    background-color: white;
+    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2);
+}
+
+/* Modal de Login - Material Design */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background-color: var(--surface);
+    border-radius: 12px;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    animation: slideDown 0.3s ease;
+    overflow: hidden;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100px) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+.close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.close-button:hover {
+    transform: scale(1.2);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-body form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.modal-body .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.modal-body label {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.modal-body input[type="text"],
+.modal-body input[type="password"],
+.modal-body .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--divider);
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.modal-body input[type="text"]:focus,
+.modal-body input[type="password"]:focus,
+.modal-body .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(255, 111, 0, 0.1);
+}
+
+.modal-footer {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.modal-footer .btn {
+    flex: 1;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-footer .btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.modal-footer .btn-primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2);
+}
+
+.modal-footer .btn-secondary {
+    background-color: #e0e0e0;
+    color: var(--text-primary);
+}
+
+.modal-footer .btn-secondary:hover {
+    background-color: #d0d0d0;
+}
+
+/* Botones de autenticación - en el navbar */

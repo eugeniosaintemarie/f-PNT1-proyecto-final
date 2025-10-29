@@ -1,9 +1,5 @@
 namespace EncontraTuMascota.Helpers;
 
-/// <summary>
-/// Mensajes predefinidos para no estar escribiendo todo el tiempo lo mismo.
-/// Están divididos en categorías: Success, Error y Validation.
-/// </summary>
 public static class Messages
 {
     // Mensajes cuando sale todo bien
