@@ -4,7 +4,7 @@
 **Backlog:** https://github.com/users/eugeniosaintemarie/projects/1/views/1
 
 ## Demo
-### Home
+### Home (universal)
 ![Captura1.png](Captura1.png)
 
 ### Publicaciones (público)
