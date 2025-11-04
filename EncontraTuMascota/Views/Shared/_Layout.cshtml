@@ -17,20 +17,27 @@
                 </a>
                 <div class="nav-menu">
                     <ul class="nav-links">
-                        <li><a asp-controller="Mascotas" asp-action="Publicar">Publicar mascota</a></li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li><a asp-controller="Mascotas" asp-action="Publicar">Publicar mascota</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="#" onclick="mostrarAvisoAuth(); return false;">Publicar mascota</a></li>
+                        }
                         <li><a asp-controller="Mascotas" asp-action="Buscar">Buscar mascotas</a></li>
                     </ul>
                 </div>
                 <div class="auth-buttons">
-                    @if (Context.Session.GetString("Usuario") != null)
+                    @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <span class="usuario-logueado">👤 @Context.Session.GetString("Usuario")</span>
+                        <span class="usuario-logueado">👤 @User.Identity.Name</span>
                         <a href="#" onclick="logout(); return false;" class="btn btn-outline">Salir</a>
                     }
                     else
                     {
                         <a href="#" onclick="mostrarLogin(); return false;" class="btn btn-outline">Acceder</a>
-                        <a href="#" onclick="alert('Próximamente'); return false;" class="btn btn-primary">Registrarse</a>
+                        <a href="#" onclick="mostrarRegistro(); return false;" class="btn btn-primary">Registrarse</a>
                     }
                 </div>
             </div>
@@ -47,7 +54,7 @@
             <div class="modal-body">
                 <form id="loginForm" onsubmit="handleLogin(event)">
                     <div class="form-group">
-                        <label for="username">Usuario:</label>
+                        <label for="username">Nombre de usuario:</label>
                         <input type="text" id="username" name="username" class="form-control" required />
                     </div>
                     <div class="form-group">
@@ -60,6 +67,67 @@
                         <button type="button" onclick="cerrarLogin()" class="btn btn-secondary">Cancelar</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    @* Popup de Registro - oculto por defecto *@
+    <div id="registerPopup" class="modal-overlay" style="display: none;" onclick="cerrarRegistro()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>📝 Registrarse</h2>
+                <button onclick="cerrarRegistro()" class="close-btn">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="regNombreCompleto">Nombre completo:</label>
+                        <input type="text" id="regNombreCompleto" name="nombreCompleto" class="form-control" required minlength="2" maxlength="100" />
+                    </div>
+                    <div class="form-group">
+                        <label for="regUsername">Nombre de usuario:</label>
+                        <input type="text" id="regUsername" name="username" class="form-control" required minlength="3" maxlength="50" />
+                        <small class="form-text text-muted">Mínimo 3 caracteres, solo letras, números y guiones bajos</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email (opcional):</label>
+                        <input type="email" id="regEmail" name="email" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Contraseña:</label>
+                        <input type="password" id="regPassword" name="password" class="form-control" required minlength="5" />
+                        <small class="form-text text-muted">Mínimo 5 caracteres, debe incluir minúscula y número</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="regConfirmPassword">Confirmar contraseña:</label>
+                        <input type="password" id="regConfirmPassword" name="confirmPassword" class="form-control" required />
+                    </div>
+                    <div id="registerError" class="alert alert-danger" style="display:none;"></div>
+                    <div id="registerSuccess" class="alert alert-success" style="display:none;"></div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Registrarse</button>
+                        <button type="button" onclick="cerrarRegistro()" class="btn btn-secondary">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @* Popup de Aviso de Autenticación - oculto por defecto *@
+    <div id="authWarningPopup" class="modal-overlay" style="display: none;" onclick="cerrarAvisoAuth()">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 450px;">
+            <div class="modal-header">
+                <h2>🔒 Autenticación Requerida</h2>
+                <button onclick="cerrarAvisoAuth()" class="close-btn">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="text-align: center; margin: 20px 0; font-size: 1.1em;">
+                    Inicia sesión para cargar una mascota encontrada o registrate
+                </p>
+                <div class="modal-footer" style="justify-content: center; gap: 15px;">
+                    <button onclick="cerrarAvisoAuth(); mostrarLoginConRedireccion('/Mascotas/Publicar');" class="btn btn-primary">Iniciar Sesión</button>
+                    <button onclick="cerrarAvisoAuth(); mostrarRegistro();" class="btn btn-primary">Registrarse</button>
+                </div>
             </div>
         </div>
     </div>
@@ -77,52 +145,153 @@
     </footer>
 
     <script>
+        // Variable global para almacenar la URL de redirección después del login
+        let redirectAfterLogin = null;
+
         // Mostrar popup de login
         function mostrarLogin() {
+            redirectAfterLogin = null; // Sin redirección por defecto
             document.getElementById('loginPopup').style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // Previene scroll mientras el modal está abierto
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Mostrar popup de login con redirección
+        function mostrarLoginConRedireccion(url) {
+            redirectAfterLogin = url;
+            document.getElementById('loginPopup').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
 
         // Cerrar popup de login
         function cerrarLogin() {
             document.getElementById('loginPopup').style.display = 'none';
             document.getElementById('loginError').style.display = 'none';
-            document.body.style.overflow = 'auto'; // Restaura el scroll
+            document.body.style.overflow = 'auto';
+            redirectAfterLogin = null; // Limpiar redirección al cerrar
         }
 
-        // Cerrar modal si se hace click fuera del contenido
-        window.onclick = function(event) {
-            const modal = document.getElementById('loginPopup');
-            if (event.target === modal) {
-                cerrarLogin();
-            }
+        // Mostrar popup de registro
+        function mostrarRegistro() {
+            document.getElementById('registerPopup').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
 
-        // Manejar el login
+        // Cerrar popup de registro
+        function cerrarRegistro() {
+            document.getElementById('registerPopup').style.display = 'none';
+            document.getElementById('registerError').style.display = 'none';
+            document.getElementById('registerSuccess').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Mostrar popup de aviso de autenticación
+        function mostrarAvisoAuth() {
+            document.getElementById('authWarningPopup').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Cerrar popup de aviso de autenticación
+        function cerrarAvisoAuth() {
+            document.getElementById('authWarningPopup').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Manejar el login con Identity
         function handleLogin(event) {
             event.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
             
-            if (username === 'admin' && password === 'admin') {
-                // Login exitoso
-                fetch('/Account/Login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `username=${username}&password=${password}`
-                }).then(response => {
-                    if (response.ok) {
+            fetch('/Account/Login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&rememberMe=false`
+            }).then(response => {
+                if (response.ok) {
+                    // Si hay una URL de redirección guardada, ir ahí; sino, recargar
+                    if (redirectAfterLogin) {
+                        window.location.href = redirectAfterLogin;
+                    } else {
                         window.location.reload();
                     }
-                });
-            } else {
-                // Login fallido
-                const errorDiv = document.getElementById('loginError');
-                errorDiv.textContent = 'Usuario o contraseña incorrectos';
+                } else {
+                    return response.text().then(text => {
+                        errorDiv.textContent = 'Usuario o contraseña incorrectos';
+                        errorDiv.style.display = 'block';
+                    });
+                }
+            }).catch(error => {
+                errorDiv.textContent = 'Error al iniciar sesión';
                 errorDiv.style.display = 'block';
+            });
+        }
+
+        // Manejar el registro con Identity
+        function handleRegister(event) {
+            event.preventDefault();
+            const nombreCompleto = document.getElementById('regNombreCompleto').value;
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const errorDiv = document.getElementById('registerError');
+            const successDiv = document.getElementById('registerSuccess');
+            
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            // Validar que las contraseñas coincidan
+            if (password !== confirmPassword) {
+                errorDiv.textContent = 'Las contraseñas no coinciden';
+                errorDiv.style.display = 'block';
+                return;
             }
+            
+            // Validar requisitos de contraseña (sin mayúscula requerida, pero permitida)
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            
+            if (!hasLowerCase || !hasNumber || password.length < 5) {
+                errorDiv.textContent = 'La contraseña debe tener al menos 5 caracteres, incluir minúscula y número';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            fetch('/Account/Register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `nombreCompleto=${encodeURIComponent(nombreCompleto)}&username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&confirmPassword=${encodeURIComponent(confirmPassword)}`
+            }).then(response => {
+                if (response.ok) {
+                    successDiv.textContent = 'Registro exitoso! Redirigiendo...';
+                    successDiv.style.display = 'block';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    return response.text().then(text => {
+                        // Intentar extraer el mensaje de error del HTML
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(text, 'text/html');
+                        const errorMessages = doc.querySelectorAll('.validation-summary-errors li, .text-danger');
+                        
+                        if (errorMessages.length > 0) {
+                            errorDiv.innerHTML = Array.from(errorMessages).map(el => el.textContent).join('<br>');
+                        } else {
+                            errorDiv.textContent = 'Error al registrarse. Por favor, verifica los datos.';
+                        }
+                        errorDiv.style.display = 'block';
+                    });
+                }
+            }).catch(error => {
+                errorDiv.textContent = 'Error al procesar el registro';
+                errorDiv.style.display = 'block';
+            });
         }
 
         // Logout

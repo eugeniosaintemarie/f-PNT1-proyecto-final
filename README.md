@@ -1,9 +1,12 @@
 # Programación en Nuevas Tecnologías 1
-## Proyecto final
-### 'Encontra tu mascota'
-**Backlog:** https://github.com/users/eugeniosaintemarie/projects/1/views/1
+
+## Proyecto final 'Encontrá Tu Mascota'
+**Plataforma web colaborativa para reunir mascotas perdidas con sus familias**
+
+Backlog: https://github.com/users/eugeniosaintemarie/projects/1/views/1
 
 ## Demo
+
 ### Home (universal)
 ![Captura1.png](Captura1.png)
 

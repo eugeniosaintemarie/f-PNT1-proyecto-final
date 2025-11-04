@@ -18,7 +18,6 @@ public static class DatosDePrueba
         {
             new Mascota
             {
-                Id = 1,
                 FotoUrl = "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400",
                 Sexo = Sexo.Masculino,
                 Raza = Raza.Labrador,
@@ -30,7 +29,6 @@ public static class DatosDePrueba
             },
             new Mascota
             {
-                Id = 2,
                 FotoUrl = "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400",
                 Sexo = Sexo.Femenino,
                 Raza = Raza.GoldenRetriever,
@@ -42,7 +40,6 @@ public static class DatosDePrueba
             },
             new Mascota
             {
-                Id = 3,
                 FotoUrl = "https://images.unsplash.com/photo-1568572933382-74d440642117?w=400",
                 Sexo = Sexo.Masculino,
                 Raza = Raza.PastorAleman,
@@ -54,7 +51,6 @@ public static class DatosDePrueba
             },
             new Mascota
             {
-                Id = 4,
                 FotoUrl = "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400",
                 Sexo = Sexo.Femenino,
                 Raza = Raza.Beagle,
@@ -66,7 +62,6 @@ public static class DatosDePrueba
             },
             new Mascota
             {
-                Id = 5,
                 FotoUrl = "https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400",
                 Sexo = Sexo.Masculino,
                 Raza = Raza.Bulldog,
@@ -78,7 +73,6 @@ public static class DatosDePrueba
             },
             new Mascota
             {
-                Id = 6,
                 FotoUrl = "https://images.unsplash.com/photo-1552053831-71594a27632d?w=400",
                 Sexo = Sexo.Femenino,
                 Raza = Raza.Poodle,
@@ -90,7 +84,6 @@ public static class DatosDePrueba
             },
             new Mascota
             {
-                Id = 7,
                 FotoUrl = "https://images.unsplash.com/photo-1534361960057-19889db9621e?w=400",
                 Sexo = Sexo.Masculino,
                 Raza = Raza.HuskySiberiano,
@@ -102,7 +95,6 @@ public static class DatosDePrueba
             },
             new Mascota
             {
-                Id = 8,
                 FotoUrl = "https://images.unsplash.com/photo-1558788353-f76d92427f16?w=400",
                 Sexo = Sexo.Femenino,
                 Raza = Raza.Mestizo,
@@ -114,7 +106,6 @@ public static class DatosDePrueba
             },
             new Mascota
             {
-                Id = 9,
                 FotoUrl = "https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?w=400",
                 Sexo = Sexo.Masculino,
                 Raza = Raza.Boxer,
@@ -126,7 +117,6 @@ public static class DatosDePrueba
             },
             new Mascota
             {
-                Id = 10,
                 FotoUrl = "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400",
                 Sexo = Sexo.Femenino,
                 Raza = Raza.Chihuahua,
@@ -167,7 +157,6 @@ public static class DatosDePrueba
             var mascota = mascotas[i];
             publicaciones.Add(new Publicacion
             {
-                Id = i + 1,
                 MascotaId = mascota.Id,
                 Descripcion = descripciones[i],
                 Contacto = $"{mascota.NombreContacto} - Tel: {mascota.TelefonoContacto} - Email: {mascota.EmailContacto}",

@@ -1,46 +1,51 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using EncontraTuMascota.Models;
 using EncontraTuMascota.Helpers;
+using EncontraTuMascota.Data;
 
 namespace EncontraTuMascota.Controllers;
 
 /// <summary>
 /// Este es el controlador más importante del sistema.
 /// Acá está toda la lógica para publicar y buscar mascotas perdidas.
-/// Por ahora guarda todo en memoria, pero después lo vamos a conectar a una BD.
+/// Ahora usa Entity Framework Core para guardar todo en SQL Server.
 /// </summary>
 public class MascotasController : Controller
 {
-    // Listas en memoria (temporal hasta que tengamos Entity Framework funcionando)
-    // AVISO: Si reiniciás el server se borra todo, es normal por ahora
-    private static readonly MascotasList _mascotas = new();
-    private static readonly PublicacionesList _publicaciones = new();
-    
-    // Flag para saber si ya cargamos los datos de prueba
-    private static bool _datosDePruebaCargados = false;
+    // Inyectamos el contexto de la base de datos
+    private readonly ApplicationDbContext _context;
     
     // Esto lo necesitamos para guardar las fotos en el servidor
     private readonly IWebHostEnvironment _webHostEnvironment;
+    
+    // Para obtener el usuario actual
+    private readonly UserManager<Usuario> _userManager;
 
-    public MascotasController(IWebHostEnvironment webHostEnvironment)
+    public MascotasController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<Usuario> userManager)
     {
+        _context = context;
         _webHostEnvironment = webHostEnvironment;
+        _userManager = userManager;
         
-        // Cargamos los datos de prueba la primera vez que se instancia el controller
-        if (!_datosDePruebaCargados && DatosDePrueba.USAR_DATOS_DE_PRUEBA)
+        // Cargamos los datos de prueba si la BD está vacía
+        if (DatosDePrueba.USAR_DATOS_DE_PRUEBA && !_context.Mascotas.Any())
         {
             var mascotasPrueba = DatosDePrueba.GenerarMascotas();
             var publicacionesPrueba = DatosDePrueba.GenerarPublicaciones(mascotasPrueba);
             
-            _mascotas.AddRange(mascotasPrueba);
-            _publicaciones.AddRange(publicacionesPrueba);
-            
-            _datosDePruebaCargados = true;
+            _context.Mascotas.AddRange(mascotasPrueba);
+            _context.Publicaciones.AddRange(publicacionesPrueba);
+            _context.SaveChanges();
         }
     }
 
     // GET: /Mascotas/Publicar
     // Muestra el formulario para publicar una mascota encontrada
+    // REQUIERE ESTAR LOGUEADO
+    [Authorize]
     public IActionResult Publicar()
     {
         return View();
@@ -48,10 +53,15 @@ public class MascotasController : Controller
 
     // POST: /Mascotas/Publicar
     // Acá cae toda la data cuando apretás el botón de "Publicar"
+    // REQUIERE ESTAR LOGUEADO
+    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Publicar(Mascota mascota, string descripcion, IFormFile? foto)
     {
+        // Obtenemos el usuario actual
+        var usuario = await _userManager.GetUserAsync(User);
+        
         // Primero chequeamos si subió una foto (es obligatoria, sino ¿cómo la va a reconocer?)
         if (foto != null && foto.Length > 0)
         {
@@ -82,25 +92,25 @@ public class MascotasController : Controller
         // Si pasó todas las validaciones, guardamos la mascota
         if (ModelState.IsValid)
         {
-            // Le asignamos un ID (por ahora manual, después lo hace la BD)
-            mascota.Id = _mascotas.Count > 0 ? _mascotas.Max(m => m.Id) + 1 : 1;
+            // Asignamos la fecha de publicación
             mascota.FechaPublicacion = DateTime.Now;
             
-            // Agregamos a la lista
-            _mascotas.Add(mascota);
+            // Agregamos la mascota a la BD (el ID se genera automáticamente)
+            _context.Mascotas.Add(mascota);
+            await _context.SaveChangesAsync();
 
             // Creamos la publicación que va asociada a esta mascota
             var publicacion = new Publicacion
             {
-                Id = _publicaciones.Count > 0 ? _publicaciones.Max(p => p.Id) + 1 : 1,
                 MascotaId = mascota.Id,
+                UsuarioId = usuario?.Id, // Vinculamos con el usuario actual
                 Descripcion = descripcion,
                 Contacto = $"{mascota.NombreContacto} - Tel: {mascota.TelefonoContacto} - Email: {mascota.EmailContacto}",
-                Fecha = DateTime.Now,
-                Mascota = mascota
+                Fecha = DateTime.Now
             };
 
-            _publicaciones.Add(publicacion);
+            _context.Publicaciones.Add(publicacion);
+            await _context.SaveChangesAsync();
 
             // Mostramos un mensaje de éxito y redirigimos a la búsqueda
             TempData["SuccessMessage"] = Messages.Success.MascotaPublicada;
@@ -113,22 +123,21 @@ public class MascotasController : Controller
 
     // GET: /Mascotas/Buscar
     // Búsqueda con filtros avanzados: ubicación, sexo (checkboxes), raza y fecha
-    public IActionResult Buscar(string? termino, bool sexoMasculino = false, bool sexoFemenino = false, int? raza = null, DateTime? fechaDesde = null)
+    public async Task<IActionResult> Buscar(string? termino, bool sexoMasculino = false, bool sexoFemenino = false, int? raza = null, DateTime? fechaDesde = null)
     {
-        // Empezamos con todas las mascotas
-        var mascotas = _mascotas.AsEnumerable();
+        // Empezamos con todas las mascotas, incluyendo sus publicaciones
+        var query = _context.Mascotas.Include(m => m.Publicaciones).AsQueryable();
 
         // Filtro 1: Si pusiste algo en el buscador de ubicación, filtramos
         if (!string.IsNullOrWhiteSpace(termino))
         {
-            mascotas = mascotas.Where(m => 
-                m.Ubicacion!.Contains(termino, StringComparison.OrdinalIgnoreCase));
+            query = query.Where(m => m.Ubicacion!.Contains(termino));
         }
 
         // Filtro 2: Si seleccionaste sexos específicos (checkboxes)
         if (sexoMasculino || sexoFemenino)
         {
-            mascotas = mascotas.Where(m => 
+            query = query.Where(m => 
                 (sexoMasculino && m.Sexo == Sexo.Masculino) ||
                 (sexoFemenino && m.Sexo == Sexo.Femenino));
         }
@@ -136,14 +145,20 @@ public class MascotasController : Controller
         // Filtro 3: Si seleccionaste una raza específica
         if (raza.HasValue)
         {
-            mascotas = mascotas.Where(m => (int)m.Raza == raza.Value);
+            query = query.Where(m => (int)m.Raza == raza.Value);
         }
 
         // Filtro 4: Si pusiste una fecha "desde", filtramos mascotas publicadas desde esa fecha
         if (fechaDesde.HasValue)
         {
-            mascotas = mascotas.Where(m => m.FechaPublicacion >= fechaDesde.Value);
+            query = query.Where(m => m.FechaPublicacion >= fechaDesde.Value);
         }
+
+        // Ejecutamos la query y obtenemos los resultados
+        var mascotas = await query.OrderByDescending(m => m.FechaPublicacion).ToListAsync();
+
+        // Obtenemos todas las publicaciones para pasarlas a la vista
+        var publicaciones = await _context.Publicaciones.Include(p => p.Mascota).ToListAsync();
 
         // Pasamos la data a la vista (incluimos los filtros aplicados para mantenerlos seleccionados)
         ViewBag.Termino = termino;
@@ -151,8 +166,9 @@ public class MascotasController : Controller
         ViewBag.SexoFemenino = sexoFemenino;
         ViewBag.RazaSeleccionada = raza;
         ViewBag.FechaDesde = fechaDesde?.ToString("yyyy-MM-dd");
-        ViewBag.Publicaciones = _publicaciones;
+        ViewBag.Publicaciones = publicaciones;
         
-        return View(mascotas.ToList());
+        return View(mascotas);
     }
 }
+

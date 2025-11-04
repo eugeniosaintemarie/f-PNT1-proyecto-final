@@ -150,7 +150,7 @@
                                 <p class="descripcion">@publicacion.Descripcion</p>
                                 <div class="contacto-box">
                                     <strong>📞 Contacto:</strong><br />
-                                    @if (Context.Session.GetString("Usuario") != null)
+                                    @if (User.Identity?.IsAuthenticated == true)
                                     {
                                         @* Usuario logueado: mostrar datos sin blur *@
                                         <strong>Nombre:</strong> @mascota.NombreContacto<br />

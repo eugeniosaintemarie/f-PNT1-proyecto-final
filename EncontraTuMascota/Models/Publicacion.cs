@@ -37,6 +37,14 @@ public class Publicacion
     [DataType(DataType.DateTime)]
     public DateTime Fecha { get; set; } = DateTime.Now;
 
+    // Usuario que creó esta publicación (opcional por ahora para compatibilidad)
+    [Display(Name = "Usuario")]
+    public string? UsuarioId { get; set; }
+
     // Esto es para que EF Core pueda navegar entre Publicacion y Mascota
     public virtual Mascota? Mascota { get; set; }
+    
+    // Navegación al usuario que creó la publicación
+    [ForeignKey("UsuarioId")]
+    public virtual Usuario? Usuario { get; set; }
 }
