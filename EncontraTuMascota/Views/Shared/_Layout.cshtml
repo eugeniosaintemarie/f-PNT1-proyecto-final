@@ -31,8 +31,10 @@
                 <div class="auth-buttons">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <span class="usuario-logueado">👤 @User.Identity.Name</span>
-                        <a href="#" onclick="logout(); return false;" class="btn btn-outline">Salir</a>
+                        <a href="@Url.Action("MisPublicaciones", "Account")" class="usuario-logueado" title="Ver mis publicaciones">
+                            👤 @User.Identity.Name
+                        </a>
+                        <a href="#" onclick="cerrarSesion(); return false;" class="btn btn-outline">Salir</a>
                     }
                     else
                     {

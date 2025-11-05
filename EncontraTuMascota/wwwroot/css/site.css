@@ -132,6 +132,15 @@ body {
     color: white;
     font-weight: 500;
     padding: 0.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+}
+
+.usuario-logueado:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #FFA726;
+    cursor: pointer;
 }
 
 .btn-outline {

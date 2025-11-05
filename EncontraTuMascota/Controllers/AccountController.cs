@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using EncontraTuMascota.Models;
+using EncontraTuMascota.Data;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EncontraTuMascota.Controllers;
 
@@ -13,11 +16,13 @@ public class AccountController : Controller
 {
     private readonly UserManager<Usuario> _userManager;
     private readonly SignInManager<Usuario> _signInManager;
+    private readonly ApplicationDbContext _context;
 
-    public AccountController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager)
+    public AccountController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager, ApplicationDbContext context)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _context = context;
     }
 
     // GET: /Account/Login
@@ -140,6 +145,62 @@ public class AccountController : Controller
     {
         // Redirigir al home en lugar de mostrar una vista
         return Redirect("/");
+    }
+
+    // GET: /Account/MisPublicaciones
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> MisPublicaciones()
+    {
+        var usuario = await _userManager.GetUserAsync(User);
+        if (usuario == null)
+        {
+            return Redirect("/");
+        }
+
+        // Obtener todas las publicaciones del usuario con la mascota relacionada
+        var publicaciones = await _context.Publicaciones
+            .Include(p => p.Mascota)
+            .Where(p => p.UsuarioId == usuario.Id)
+            .OrderByDescending(p => p.Fecha)
+            .ToListAsync();
+
+        ViewBag.NombreUsuario = usuario.UserName;
+        return View(publicaciones);
+    }
+
+    // POST: /Account/CerrarPublicacion
+    [Authorize]
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> CerrarPublicacion(int id, string resolucion)
+    {
+        var usuario = await _userManager.GetUserAsync(User);
+        if (usuario == null)
+        {
+            return Unauthorized();
+        }
+
+        var publicacion = await _context.Publicaciones
+            .FirstOrDefaultAsync(p => p.Id == id && p.UsuarioId == usuario.Id);
+
+        if (publicacion == null)
+        {
+            return NotFound("Publicación no encontrada o no tienes permisos para cerrarla");
+        }
+
+        if (string.IsNullOrWhiteSpace(resolucion))
+        {
+            return BadRequest("Debes escribir cómo se resolvió el caso");
+        }
+
+        publicacion.Cerrada = true;
+        publicacion.FechaCierre = DateTime.Now;
+        publicacion.Resolucion = resolucion;
+
+        await _context.SaveChangesAsync();
+
+        return Ok();
     }
 }
 

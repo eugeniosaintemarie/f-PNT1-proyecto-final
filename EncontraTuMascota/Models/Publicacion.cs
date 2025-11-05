@@ -41,6 +41,21 @@ public class Publicacion
     [Display(Name = "Usuario")]
     public string? UsuarioId { get; set; }
 
+    // Estado de la publicación
+    [Display(Name = "Estado")]
+    public bool Cerrada { get; set; } = false;
+
+    // Fecha de cierre
+    [Display(Name = "Fecha de Cierre")]
+    [DataType(DataType.DateTime)]
+    public DateTime? FechaCierre { get; set; }
+
+    // Resolución del caso (cómo se resolvió)
+    [Display(Name = "Resolución")]
+    [StringLength(500, ErrorMessage = "La resolución no puede exceder 500 caracteres")]
+    [DataType(DataType.MultilineText)]
+    public string? Resolucion { get; set; }
+
     // Esto es para que EF Core pueda navegar entre Publicacion y Mascota
     public virtual Mascota? Mascota { get; set; }
     
