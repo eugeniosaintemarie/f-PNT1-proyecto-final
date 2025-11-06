@@ -202,6 +202,129 @@ public class AccountController : Controller
 
         return Ok();
     }
+
+    // GET: /Account/EditarPublicacion
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> EditarPublicacion(int id)
+    {
+        var usuario = await _userManager.GetUserAsync(User);
+        if (usuario == null)
+        {
+            return Redirect("/");
+        }
+
+        var publicacion = await _context.Publicaciones
+            .Include(p => p.Mascota)
+            .FirstOrDefaultAsync(p => p.Id == id && p.UsuarioId == usuario.Id);
+
+        if (publicacion == null)
+        {
+            TempData["Error"] = "Publicación no encontrada o no tienes permisos para editarla";
+            return RedirectToAction("MisPublicaciones");
+        }
+
+        // No se pueden editar publicaciones cerradas
+        if (publicacion.Cerrada)
+        {
+            TempData["Error"] = "No se pueden editar publicaciones cerradas";
+            return RedirectToAction("MisPublicaciones");
+        }
+
+        return View(publicacion);
+    }
+
+    // POST: /Account/EditarPublicacion
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditarPublicacion(int id, Publicacion model)
+    {
+        var usuario = await _userManager.GetUserAsync(User);
+        if (usuario == null)
+        {
+            return Redirect("/");
+        }
+
+        var publicacion = await _context.Publicaciones
+            .Include(p => p.Mascota)
+            .FirstOrDefaultAsync(p => p.Id == id && p.UsuarioId == usuario.Id);
+
+        if (publicacion == null)
+        {
+            TempData["Error"] = "Publicación no encontrada o no tienes permisos para editarla";
+            return RedirectToAction("MisPublicaciones");
+        }
+
+        if (publicacion.Cerrada)
+        {
+            TempData["Error"] = "No se pueden editar publicaciones cerradas";
+            return RedirectToAction("MisPublicaciones");
+        }
+
+        // Actualizar los datos de la mascota
+        if (publicacion.Mascota == null)
+        {
+            TempData["Error"] = "Error al cargar los datos de la mascota";
+            return RedirectToAction("MisPublicaciones");
+        }
+
+        publicacion.Mascota.Ubicacion = model.Mascota?.Ubicacion ?? publicacion.Mascota.Ubicacion;
+        publicacion.Mascota.Sexo = model.Mascota?.Sexo ?? publicacion.Mascota.Sexo;
+        publicacion.Mascota.Raza = model.Mascota?.Raza ?? publicacion.Mascota.Raza;
+        publicacion.Mascota.NombreContacto = model.Mascota?.NombreContacto ?? publicacion.Mascota.NombreContacto;
+        publicacion.Mascota.TelefonoContacto = model.Mascota?.TelefonoContacto ?? publicacion.Mascota.TelefonoContacto;
+        publicacion.Mascota.EmailContacto = model.Mascota?.EmailContacto;
+        
+        if (!string.IsNullOrWhiteSpace(model.Mascota?.FotoUrl))
+        {
+            publicacion.Mascota.FotoUrl = model.Mascota.FotoUrl;
+        }
+
+        // Actualizar descripción de la publicación si se proporcionó
+        if (!string.IsNullOrWhiteSpace(model.Descripcion))
+        {
+            publicacion.Descripcion = model.Descripcion;
+        }
+
+        await _context.SaveChangesAsync();
+
+        TempData["Mensaje"] = "Publicación actualizada exitosamente";
+        return RedirectToAction("MisPublicaciones");
+    }
+
+    // POST: /Account/EliminarPublicacion
+    [Authorize]
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> EliminarPublicacion(int id)
+    {
+        var usuario = await _userManager.GetUserAsync(User);
+        if (usuario == null)
+        {
+            return Unauthorized();
+        }
+
+        var publicacion = await _context.Publicaciones
+            .Include(p => p.Mascota)
+            .FirstOrDefaultAsync(p => p.Id == id && p.UsuarioId == usuario.Id);
+
+        if (publicacion == null)
+        {
+            return NotFound("Publicación no encontrada o no tienes permisos para eliminarla");
+        }
+
+        if (publicacion.Mascota == null)
+        {
+            return BadRequest("Error: mascota no encontrada");
+        }
+
+        // Eliminar la mascota (cascade delete eliminará la publicación)
+        _context.Mascotas.Remove(publicacion.Mascota);
+        await _context.SaveChangesAsync();
+
+        return Ok();
+    }
 }
 
 // ViewModels para Login y Registro

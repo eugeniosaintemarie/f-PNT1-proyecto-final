@@ -96,6 +96,44 @@
         background: #45a049;
     }
 
+    .btn-editar {
+        background: #2196F3;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.3s;
+        text-decoration: none;
+    }
+
+    .btn-editar:hover {
+        background: #0b7dda;
+        color: white;
+    }
+
+    .btn-eliminar {
+        background: #f44336;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.3s;
+    }
+
+    .btn-eliminar:hover {
+        background: #da190b;
+    }
+
     .badge-cerrada {
         background: #666;
         color: white;
@@ -241,7 +279,7 @@
 
 <div class="publicaciones-container">
     <div class="page-header">
-        <h1>📋 Mis Publicaciones</h1>
+        <h1>📋 Mis publicaciones</h1>
         <p style="color: #666; margin-top: 10px;">
             Bienvenido <strong>@ViewBag.NombreUsuario</strong>, aquí puedes ver y gestionar tus publicaciones
         </p>
@@ -281,11 +319,20 @@
                     @if (publicacion.Cerrada)
                     {
                         <span class="badge-cerrada">✓ Caso cerrado</span>
+                        <button class="btn-eliminar" onclick="confirmarEliminar(@publicacion.Id, '@publicacion.Mascota?.Ubicacion')">
+                            🗑️ Eliminar
+                        </button>
                     }
                     else
                     {
+                        <a href="@Url.Action("EditarPublicacion", "Account", new { id = publicacion.Id })" class="btn-editar">
+                            ✏️ Editar
+                        </a>
                         <button class="btn-cerrar" onclick="abrirModalCerrar(@publicacion.Id, '@publicacion.Mascota?.Ubicacion')">
                             ✓ Cerrar caso
+                        </button>
+                        <button class="btn-eliminar" onclick="confirmarEliminar(@publicacion.Id, '@publicacion.Mascota?.Ubicacion')">
+                            🗑️ Eliminar
                         </button>
                     }
                 </div>
@@ -388,4 +435,33 @@
             cerrarModalCerrar();
         }
     });
+
+    function confirmarEliminar(id, ubicacion) {
+        if (confirm(`¿Estás seguro de que deseas eliminar la publicación de "${ubicacion}"?\n\nEsta acción no se puede deshacer.`)) {
+            eliminarPublicacion(id);
+        }
+    }
+
+    async function eliminarPublicacion(id) {
+        try {
+            const formData = new FormData();
+            formData.append('id', id);
+
+            const response = await fetch('/Account/EliminarPublicacion', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                alert('✓ Publicación eliminada exitosamente');
+                location.reload();
+            } else {
+                const errorText = await response.text();
+                alert('Error al eliminar la publicación: ' + errorText);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al eliminar la publicación. Por favor, intenta nuevamente.');
+        }
+    }
 </script>

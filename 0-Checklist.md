@@ -124,13 +124,35 @@
 - ✅ Redirección inteligente post-login
 - ✅ AJAX para formularios sin recargas de página
 - ✅ Hash de contraseñas y lockout por intentos fallidos
+- ✅ Panel de usuario "Mis Publicaciones" implementado
+- ✅ Sistema de cierre de publicaciones con resolución
+- ✅ Migración para campos de cierre (Cerrada, FechaCierre, Resolucion)
+- ✅ Nombre de usuario clickeable vinculado al panel personal
+- ✅ Modal interactivo para cerrar casos con validación
+- ✅ Visualización diferenciada de publicaciones abiertas/cerradas
+- ✅ 10 publicaciones de prueba asignadas al usuario admin
+- ✅ Archivo SQLs.sql con 15 consultas útiles para administración de BD
+- ✅ Funcionalidad completa de editar publicaciones (solo abiertas)
+- ✅ Funcionalidad completa de eliminar publicaciones con confirmación
+- ✅ Validaciones de propiedad (solo el usuario propietario puede editar/eliminar)
+- ✅ Botones de acción diferenciados por estado (abiertas vs cerradas)
+- ✅ Campos obligatorios: Foto URL y Email de contacto en formularios de publicación y edición
 
 # Próximos pasos prioritarios
 Mejoras opcionales futuras:
-1. Panel de gestión de publicaciones propias
-2. Sistema de mensajería interna
-3. Geolocalización con mapas
-4. Upload de imágenes (no solo URL)
-5. Estadísticas y dashboard de admin
-6. API REST con JWT
-7. Notificaciones y alertas
+1. ✅ Panel de gestión de publicaciones propias - COMPLETADO
+   - ✅ Vista MisPublicaciones con lista de publicaciones del usuario
+   - ✅ Diseño responsive de 3 columnas (ubicación, detalles, acción)
+   - ✅ Botón "Cerrar caso" para publicaciones abiertas
+   - ✅ Modal para registrar resolución del caso
+   - ✅ Visualización de casos cerrados con fecha y resolución
+   - ✅ Nombre de usuario clickeable en navbar
+   - ✅ Migración AddPublicacionCerrada aplicada
+   - ✅ Campos: Cerrada (bit), FechaCierre (datetime2), Resolucion (nvarchar(500))
+   - ✅ AccountController con acciones MisPublicaciones y CerrarPublicacion
+   - ✅ Editar publicaciones abiertas con vista y formulario completo
+   - ✅ Eliminar publicaciones (abiertas y cerradas) con confirmación
+   - ✅ Validaciones: solo propietario puede editar/eliminar, no editar cerradas
+2. Geolocalización con mapas
+3. Upload de imágenes (no solo URL)
+4. Estadísticas y dashboard de admin

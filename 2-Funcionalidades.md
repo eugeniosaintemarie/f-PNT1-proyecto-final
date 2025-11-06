@@ -69,12 +69,12 @@ Extiende `IdentityUser` de ASP.NET Core Identity.
 - Id: int (PK, auto-incremental)
 - Sexo: Sexo (enum: Masculino, Femenino)
 - Raza: Raza (enum: 10 razas disponibles)
-- FotoUrl: string? (URL de imagen)
+- FotoUrl: string (URL de imagen, **requerido**)
 - Ubicacion: string (requerido)
 - FechaPublicacion: DateTime
 - NombreContacto: string (requerido)
 - TelefonoContacto: string (requerido, formato argentino)
-- EmailContacto: string? (opcional)
+- EmailContacto: string (email de contacto, **requerido**)
 - Publicaciones: ICollection<Publicacion> (navigation property)
 ```
 **Validaciones:**
@@ -252,14 +252,14 @@ Permite a usuarios autenticados publicar mascotas encontradas.
 - ✅ Mensaje de éxito con redirección
 - ✅ Popup de advertencia si intenta acceder sin login
 **Campos del Formulario:**
-- **Foto (URL)** (opcional)
+- **Foto (URL)** (**requerido**)
 - **Ubicación** (requerido)
 - **Sexo** (radio buttons: Masculino/Femenino)
 - **Raza** (selector dropdown)
 - **Descripción** (textarea, opcional)
-- **Nombre de Contacto** (requerido)
+- **Nombre de contacto** (requerido)
 - **Teléfono de Contacto** (requerido, validación especial)
-- **Email de Contacto** (opcional)
+- **Email de contacto** (**requerido**)
 **Validaciones Especiales:**
 - Teléfono con formato argentino (custom attribute)
 - Todos los campos con validación HTML5
@@ -344,41 +344,68 @@ Panel personal donde usuarios autenticados pueden ver y gestionar sus publicacio
   - Ubicación
   - Sexo, Raza y Fecha
   - Estado (Abierta/Cerrada)
-- ✅ Botón para cerrar publicaciones activas
+- ✅ **Gestión completa de publicaciones:**
+  - ✏️ Editar publicaciones abiertas
+  - ✓ Cerrar publicaciones activas
+  - 🗑️ Eliminar cualquier publicación
 - ✅ Modal para registrar resolución del caso
 - ✅ Visualización de resolución en casos cerrados
 - ✅ Diseño responsive con layout de 3 columnas
+- ✅ Validaciones de seguridad (solo propietario puede gestionar)
 **Acceso:**
 - Click en el nombre de usuario en la barra de navegación
 - URL directa: `/Account/MisPublicaciones`
-**Flujo de Cierre de Publicación:**
-1. Usuario hace click en "Cerrar caso" (botón verde)
-2. Se abre modal solicitando descripción de resolución
-3. Usuario escribe cómo se resolvió (mínimo 10 caracteres)
-4. Click en "Confirmar cierre"
-5. Sistema envía petición AJAX a servidor
-6. Actualiza BD: marca `Cerrada=true`, guarda `FechaCierre` y `Resolucion`
-7. Refresca vista automáticamente
-8. Publicación ahora muestra badge "Cerrada" y texto de resolución
+**Acciones Disponibles:**
+
+**1. Editar Publicación (solo abiertas):**
+- Click en botón "✏️ Editar"
+- Abre formulario con datos precargados
+- Permite modificar todos los campos de la mascota y descripción
+- No se pueden editar publicaciones cerradas
+- Solo el propietario puede editar
+
+**2. Cerrar Publicación (solo abiertas):**
+- Click en botón "✓ Cerrar caso"
+- Modal solicita descripción de resolución
+- Usuario escribe cómo se resolvió (mínimo 10 caracteres)
+- Sistema actualiza BD: `Cerrada=true`, guarda `FechaCierre` y `Resolucion`
+- Publicación muestra badge "Cerrada" y texto de resolución
+
+**3. Eliminar Publicación (abiertas y cerradas):**
+- Click en botón "🗑️ Eliminar"
+- Confirmación con dialog nativo
+- Elimina mascota y publicación (cascade delete)
+- Acción irreversible
+
 **Layout de Tarjetas:**
 ```
-┌─────────────────────────────────────────────────────┐
-│ [Ubicación]        [Sexo | Raza]     [🗹 Cerrar caso]│
-│                    [Fecha]                           │
-└─────────────────────────────────────────────────────┘
+Publicación ABIERTA:
+┌──────────────────────────────────────────────────────────────┐
+│ [Ubicación]  [Sexo|Raza]  [Fecha]  [✏️Editar][✓Cerrar][🗑️]  │
+└──────────────────────────────────────────────────────────────┘
+
+Publicación CERRADA:
+┌──────────────────────────────────────────────────────────────┐
+│ [Ubicación]  [Sexo|Raza]  [Fecha]  [✓ Cerrada] [🗑️]         │
+│ Resolución: [texto completo]                                 │
+│ Cerrado el: [fecha y hora]                                   │
+└──────────────────────────────────────────────────────────────┘
 ```
-**Estados de Publicación:**
-- **Abierta:** Muestra botón verde "Cerrar caso" a la derecha
-- **Cerrada:** Muestra badge "Cerrada", fecha de cierre y resolución
 **Validaciones:**
+- Solo el propietario puede ver/editar/eliminar sus publicaciones
+- Publicaciones cerradas no se pueden editar (solo eliminar)
 - Resolución debe tener mínimo 10 caracteres
-- Solo el propietario puede cerrar sus publicaciones
-- No se puede cerrar una publicación ya cerrada
+- Confirmación obligatoria para eliminar
 **Implementación Técnica:**
-- **Controller:** `AccountController.MisPublicaciones()` (GET)
-- **Controller:** `AccountController.CerrarPublicacion()` (POST)
-- **View:** `MisPublicaciones.cshtml`
-- **AJAX:** Llamadas asíncronas sin recarga de página
+- **Controllers:** 
+  - `AccountController.MisPublicaciones()` (GET)
+  - `AccountController.EditarPublicacion()` (GET y POST)
+  - `AccountController.CerrarPublicacion()` (POST)
+  - `AccountController.EliminarPublicacion()` (POST)
+- **Views:** 
+  - `MisPublicaciones.cshtml` (lista)
+  - `EditarPublicacion.cshtml` (formulario)
+- **AJAX:** Llamadas asíncronas para cerrar y eliminar
 - **Modal:** Popup con textarea para resolución
 
 ## 🎛️ Controladores
@@ -546,6 +573,51 @@ public async Task<IActionResult> CerrarPublicacion(int id, string resolucion)
   - Retorna OK o BadRequest/NotFound
 - **Response:** JSON (para AJAX)
 
+#### `EditarPublicacion()` - GET
+```csharp
+[Authorize]
+[HttpGet]
+public async Task<IActionResult> EditarPublicacion(int id)
+```
+- **Autenticación:** Requerida
+- **Funcionalidad:**
+  - Obtiene usuario actual
+  - Busca publicación con Include de Mascota
+  - Verifica propiedad
+  - Valida que no esté cerrada
+  - Retorna vista con modelo
+- **Vista:** `EditarPublicacion.cshtml`
+
+#### `EditarPublicacion()` - POST
+```csharp
+[Authorize]
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> EditarPublicacion(int id, Publicacion model)
+```
+- **Autenticación:** Requerida
+- **Funcionalidad:**
+  - Valida propiedad y estado (no cerrada)
+  - Actualiza todos los campos de Mascota
+  - Actualiza descripción de Publicacion
+  - Guarda cambios en BD
+  - Redirige a MisPublicaciones con mensaje
+- **Redirección:** `MisPublicaciones`
+
+#### `EliminarPublicacion()` - POST
+```csharp
+[Authorize]
+[HttpPost]
+[IgnoreAntiforgeryToken]
+public async Task<IActionResult> EliminarPublicacion(int id)
+```
+- **Autenticación:** Requerida
+- **Funcionalidad:**
+  - Verifica propiedad de la publicación
+  - Elimina la mascota (cascade elimina publicación)
+  - Retorna OK o NotFound
+- **Response:** JSON (para AJAX)
+
 #### `AccessDenied()` - GET
 ```csharp
 public IActionResult AccessDenied()
@@ -707,10 +779,15 @@ Botones:
 - Layout de 3 columnas por card:
   1. Izquierda: Ubicación (texto grande)
   2. Centro: Detalles (Sexo, Raza, Fecha)
-  3. Derecha: Acción (botón o estado)
-- Condicional según estado:
-  - ABIERTA: Botón "Cerrar caso" verde
-  - CERRADA: Badge "Cerrada" + fecha + resolución
+  3. Derecha: Acciones (botones según estado)
+- Botones para publicaciones ABIERTAS:
+  - "✏️ Editar" (azul) - Link a formulario
+  - "✓ Cerrar caso" (verde) - Abre modal
+  - "🗑️ Eliminar" (rojo) - Confirmación y AJAX
+- Botones para publicaciones CERRADAS:
+  - "✓ Caso cerrado" (badge gris)
+  - "🗑️ Eliminar" (rojo) - Confirmación y AJAX
+  - Muestra resolución y fecha de cierre
 ```
 
 #### Modal de Cierre
@@ -730,12 +807,14 @@ Botones:
 #### JavaScript
 ```javascript
 // Funciones globales
-- abrirModalCerrar(publicacionId)
+- abrirModalCerrar(publicacionId, ubicacion)
 - cerrarModalCerrar()
 - confirmarCerrar()
-// AJAX para cerrar publicación
+- confirmarEliminar(id, ubicacion)
+- eliminarPublicacion(id)
+// AJAX endpoints
 - POST /Account/CerrarPublicacion
-- Recarga página al completar
+- POST /Account/EliminarPublicacion
 ```
 
 **Estilos Embebidos:**
@@ -743,9 +822,60 @@ Botones:
 - .publicaciones-container: Grid responsive
 - .publicacion-card: Card con sombra y hover
 - .publicacion-layout: Flexbox de 3 columnas
-- .btn-cerrar-caso: Botón verde destacado
+- .btn-editar: Botón azul para editar
+- .btn-cerrar-caso: Botón verde para cerrar
+- .btn-eliminar: Botón rojo para eliminar
 - .modal-cerrar: Overlay con popup centrado
 - .publicacion-cerrada: Estilo para casos cerrados
+```
+
+### Vista Editar Publicación (`EditarPublicacion.cshtml`)
+**Estructura:**
+
+#### Header
+```html
+- Título: "✏️ Editar publicación"
+- Subtítulo: "Modifica los datos de tu publicación"
+```
+
+#### Formulario
+```html
+POST /Account/EditarPublicacion
+Campos (precargados con datos actuales):
+1. Foto URL (text, **requerido**)
+2. Ubicación (text, requerido)
+3. Sexo (radio buttons, precargado)
+4. Raza (select, precargado)
+5. Descripción (textarea, opcional)
+6. Nombre Contacto (text, requerido)
+7. Teléfono Contacto (text, requerido)
+8. Email Contacto (email, **requerido**)
+Hidden inputs:
+- Publicacion.Id
+- Mascota.Id
+Botones:
+- "💾 Guardar cambios" (naranja)
+- "❌ Cancelar" (gris, vuelve a lista)
+```
+
+**Validaciones Client-Side:**
+```html
+- asp-validation-for en cada campo
+- Validation summary para errores generales
+- HTML5 validation attributes
+- AntiForgeryToken incluido
+```
+
+**Estilos Embebidos:**
+```css
+- .editar-container: Contenedor centrado con sombra
+- .editar-header: Encabezado con borde inferior
+- .form-group: Grupos de formulario espaciados
+- .radio-group: Layout para radio buttons
+- .form-actions: Botones en flexbox
+- .btn-guardar: Botón principal naranja
+- .btn-cancelar: Botón secundario gris
+- Responsive para móviles
 ```
 
 ## 🔐 Sistema de Autenticación
@@ -1166,13 +1296,16 @@ if (password !== confirmPassword) {
 ## 📈 Mejoras Futuras (Roadmap)
 
 ### Funcionalidades Potenciales
-1. **Panel de Usuario Avanzado** ✅ *IMPLEMENTADO PARCIALMENTE*
+1. ✅ **Panel de Usuario Avanzado** - COMPLETADO 100%
    - ✅ Dashboard personal con publicaciones
-   - ✅ Gestión de publicaciones (cerrar casos)
-   - 🔄 Editar publicaciones existentes
-   - 🔄 Eliminar publicaciones
-   - 🔄 Historial de búsquedas
-   - 🔄 Estadísticas personales
+   - ✅ Gestión de publicaciones (editar, cerrar, eliminar)
+   - ✅ Validaciones de seguridad y propiedad
+   - ✅ Estados diferenciados (abierta/cerrada)
+   - ✅ Formulario de edición completo
+   - ✅ Confirmaciones para acciones destructivas
+   - 🔄 Futuro: Historial de búsquedas
+   - 🔄 Futuro: Estadísticas personales
+   - 🔄 Futuro: Reabrir casos cerrados
 2. **Mensajería Interna**
    - Chat entre usuarios
    - Notificaciones
@@ -1201,10 +1334,6 @@ if (password !== confirmPassword) {
    - Alertas de nuevas publicaciones
    - Matches automáticos por descripción
    - Emails transaccionales
-9. **Reapertura de Casos**
-   - Permitir reabrir publicaciones cerradas
-   - Agregar notas adicionales
-   - Historial de cambios de estado
 
 ## 🔍 Troubleshooting Común
 
