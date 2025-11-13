@@ -22,37 +22,10 @@ public static class DbInitializer
             }
         }
 
-        var adminEmail = "admin@admin.com";
-        var adminUser = await userManager.FindByEmailAsync(adminEmail);
-        
-        if (adminUser == null)
-        {
-            adminUser = new Usuario
-            {
-                UserName = adminEmail,
-                Email = adminEmail,
-                NombreCompleto = "Administrador",
-                FechaRegistro = DateTime.Now,
-                EmailConfirmed = true
-            };
-
-            var result = await userManager.CreateAsync(adminUser, "Admin123");
-            
-            if (result.Succeeded)
-            {
-                await userManager.AddToRoleAsync(adminUser, "Admin");
-                Console.WriteLine($"✅ Usuario admin creado: {adminEmail} / Admin123");
-            }
-            else
-            {
-                Console.WriteLine($"❌ Error al crear usuario admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-            }
-        }
-        
+        // Crear usuario admin con contraseña de variable de entorno
         var adminSimple = await userManager.FindByNameAsync("admin");
         if (adminSimple == null)
         {
-            // Get password from environment variable, fallback to a default
             var adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? "Admin123!";
             
             adminSimple = new Usuario
@@ -69,7 +42,7 @@ public static class DbInitializer
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(adminSimple, "Admin");
-                Console.WriteLine($"✅ Usuario admin creado: admin");
+                Console.WriteLine($"✅ Usuario admin creado: admin con contraseña de ADMIN_PASSWORD");
             }
             else
             {
