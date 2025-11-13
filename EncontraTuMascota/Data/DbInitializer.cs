@@ -61,7 +61,7 @@ public static class DbInitializer
                 EmailConfirmed = true
             };
 
-            var result = await userManager.CreateAsync(adminSimple, "Admin1");
+            var result = await userManager.CreateAsync(adminSimple, "LaFerrariRojaDeEugenio1000");
             
             if (result.Succeeded)
             {
@@ -83,6 +83,7 @@ public static class DbInitializer
                 {
                     new Mascota
                     {
+                        FotoUrl = "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400",
                         Ubicacion = "Parque Centenario, Buenos Aires",
                         Sexo = Sexo.Masculino,
                         Raza = Raza.Labrador,
@@ -93,6 +94,7 @@ public static class DbInitializer
                     },
                     new Mascota
                     {
+                        FotoUrl = "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400",
                         Ubicacion = "Plaza Italia, Palermo",
                         Sexo = Sexo.Femenino,
                         Raza = Raza.GoldenRetriever,
@@ -103,6 +105,7 @@ public static class DbInitializer
                     },
                     new Mascota
                     {
+                        FotoUrl = "https://images.unsplash.com/photo-1568572933382-74d440642117?w=400",
                         Ubicacion = "Recoleta, cerca del cementerio",
                         Sexo = Sexo.Masculino,
                         Raza = Raza.PastorAleman,
@@ -113,6 +116,7 @@ public static class DbInitializer
                     },
                     new Mascota
                     {
+                        FotoUrl = "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400",
                         Ubicacion = "Belgrano, Av. Cabildo",
                         Sexo = Sexo.Femenino,
                         Raza = Raza.Beagle,
@@ -123,6 +127,7 @@ public static class DbInitializer
                     },
                     new Mascota
                     {
+                        FotoUrl = "https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400",
                         Ubicacion = "Villa Urquiza, cerca de la estación",
                         Sexo = Sexo.Masculino,
                         Raza = Raza.Bulldog,

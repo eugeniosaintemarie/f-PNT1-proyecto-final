@@ -39,7 +39,6 @@ namespace EncontraTuMascota.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FotoUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NombreContacto")

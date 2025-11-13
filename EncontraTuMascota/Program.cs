@@ -20,9 +20,12 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     WebRootPath = webRoot
 });
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
-        "Server=(localdb)\\mssqllocaldb;Database=EncontraTuMascotaDB;Trusted_Connection=true;MultipleActiveResultSets=true",
+        connectionString,
         sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()
     ));
 

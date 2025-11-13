@@ -8,7 +8,6 @@ public class Mascota
     [Key]
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "La foto es obligatoria")]
     [Display(Name = "Foto")]
     public string? FotoUrl { get; set; }
 
