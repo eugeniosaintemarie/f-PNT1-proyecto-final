@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using EncontraTuMascota.Models;
 
@@ -22,12 +22,36 @@ public static class DbInitializer
             }
         }
 
-        // Crear usuario admin con contraseña de variable de entorno
+        var adminEmail = "admin@admin.com";
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
+        
+        if (adminUser == null)
+        {
+            adminUser = new Usuario
+            {
+                UserName = adminEmail,
+                Email = adminEmail,
+                NombreCompleto = "Administrador",
+                FechaRegistro = DateTime.Now,
+                EmailConfirmed = true
+            };
+
+            var result = await userManager.CreateAsync(adminUser, "Admin123");
+            
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(adminUser, "Admin");
+                Console.WriteLine($"Γ£à Usuario admin creado: {adminEmail} / Admin123");
+            }
+            else
+            {
+                Console.WriteLine($"Γ¥î Error al crear usuario admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
+        }
+        
         var adminSimple = await userManager.FindByNameAsync("admin");
         if (adminSimple == null)
         {
-            var adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? "Admin123!";
-            
             adminSimple = new Usuario
             {
                 UserName = "admin",
@@ -37,16 +61,16 @@ public static class DbInitializer
                 EmailConfirmed = true
             };
 
-            var result = await userManager.CreateAsync(adminSimple, adminPassword);
+            var result = await userManager.CreateAsync(adminSimple, "Admin123");
             
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(adminSimple, "Admin");
-                Console.WriteLine($"✅ Usuario admin creado: admin con contraseña de ADMIN_PASSWORD");
+                Console.WriteLine($"Γ£à Usuario admin creado: admin");
             }
             else
             {
-                Console.WriteLine($"❌ Error al crear usuario admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                Console.WriteLine($"Γ¥î Error al crear usuario admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
         }
 
@@ -64,7 +88,7 @@ public static class DbInitializer
                         Sexo = Sexo.Masculino,
                         Raza = Raza.Labrador,
                         FechaPublicacion = DateTime.Now.AddDays(-5),
-                        NombreContacto = "Juan Pérez",
+                        NombreContacto = "Juan P├⌐rez",
                         TelefonoContacto = "+541123456789",
                         EmailContacto = "juan.perez@email.com"
                     },
@@ -75,7 +99,7 @@ public static class DbInitializer
                         Sexo = Sexo.Femenino,
                         Raza = Raza.GoldenRetriever,
                         FechaPublicacion = DateTime.Now.AddDays(-3),
-                        NombreContacto = "María González",
+                        NombreContacto = "Mar├¡a Gonz├ílez",
                         TelefonoContacto = "+541198765432",
                         EmailContacto = "maria.gonzalez@email.com"
                     },
@@ -86,7 +110,7 @@ public static class DbInitializer
                         Sexo = Sexo.Masculino,
                         Raza = Raza.PastorAleman,
                         FechaPublicacion = DateTime.Now.AddDays(-7),
-                        NombreContacto = "Carlos Rodríguez",
+                        NombreContacto = "Carlos Rodr├¡guez",
                         TelefonoContacto = "+541145678901",
                         EmailContacto = "carlos.rodriguez@email.com"
                     },
@@ -97,18 +121,18 @@ public static class DbInitializer
                         Sexo = Sexo.Femenino,
                         Raza = Raza.Beagle,
                         FechaPublicacion = DateTime.Now.AddDays(-2),
-                        NombreContacto = "Ana Martínez",
+                        NombreContacto = "Ana Mart├¡nez",
                         TelefonoContacto = "+541156789012",
                         EmailContacto = "ana.martinez@email.com"
                     },
                     new Mascota
                     {
                         FotoUrl = "https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=400",
-                        Ubicacion = "Villa Urquiza, cerca de la estación",
+                        Ubicacion = "Villa Urquiza, cerca de la estaci├│n",
                         Sexo = Sexo.Masculino,
                         Raza = Raza.Bulldog,
                         FechaPublicacion = DateTime.Now.AddDays(-1),
-                        NombreContacto = "Pedro López",
+                        NombreContacto = "Pedro L├│pez",
                         TelefonoContacto = "+541167890123",
                         EmailContacto = "pedro.lopez@email.com"
                     }
@@ -132,7 +156,7 @@ public static class DbInitializer
                 await context.Publicaciones.AddRangeAsync(publicacionesPrueba);
                 await context.SaveChangesAsync();
 
-                Console.WriteLine($"✅ Se crearon {mascotasPrueba.Count} mascotas y publicaciones de prueba para el usuario admin");
+                Console.WriteLine($"Γ£à Se crearon {mascotasPrueba.Count} mascotas y publicaciones de prueba para el usuario admin");
             }
         }
     }
