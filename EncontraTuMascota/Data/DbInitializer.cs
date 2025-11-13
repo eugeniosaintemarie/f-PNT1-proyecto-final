@@ -22,33 +22,7 @@ public static class DbInitializer
             }
         }
 
-        var adminEmail = "admin@admin.com";
-        var adminUser = await userManager.FindByEmailAsync(adminEmail);
-        
-        if (adminUser == null)
-        {
-            adminUser = new Usuario
-            {
-                UserName = adminEmail,
-                Email = adminEmail,
-                NombreCompleto = "Administrador",
-                FechaRegistro = DateTime.Now,
-                EmailConfirmed = true
-            };
-
-            var result = await userManager.CreateAsync(adminUser, "Admin123");
-            
-            if (result.Succeeded)
-            {
-                await userManager.AddToRoleAsync(adminUser, "Admin");
-                Console.WriteLine($"Γ£à Usuario admin creado: {adminEmail} / Admin123");
-            }
-            else
-            {
-                Console.WriteLine($"Γ¥î Error al crear usuario admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-            }
-        }
-        
+        // Crear usuario admin
         var adminSimple = await userManager.FindByNameAsync("admin");
         if (adminSimple == null)
         {
@@ -61,16 +35,42 @@ public static class DbInitializer
                 EmailConfirmed = true
             };
 
-            var result = await userManager.CreateAsync(adminSimple, "Admin123");
+            var result = await userManager.CreateAsync(adminSimple, "LaFerrariRojaDeEugenio1000");
             
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(adminSimple, "Admin");
-                Console.WriteLine($"Γ£à Usuario admin creado: admin");
+                Console.WriteLine($"✅ Usuario admin creado con contraseña segura");
             }
             else
             {
-                Console.WriteLine($"Γ¥î Error al crear usuario admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                Console.WriteLine($"❌ Error al crear usuario admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
+        }
+
+        // Crear usuario eugenio
+        var eugenio = await userManager.FindByNameAsync("eugenio");
+        if (eugenio == null)
+        {
+            eugenio = new Usuario
+            {
+                UserName = "eugenio",
+                Email = "eugenio@sistema.com",
+                NombreCompleto = "Eugenio",
+                FechaRegistro = DateTime.Now,
+                EmailConfirmed = true
+            };
+
+            var result = await userManager.CreateAsync(eugenio, "LaFerrariRojaDeEugenio1000");
+            
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(eugenio, "Admin");
+                Console.WriteLine($"✅ Usuario eugenio creado con contraseña segura");
+            }
+            else
+            {
+                Console.WriteLine($"❌ Error al crear usuario eugenio: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
         }
 
