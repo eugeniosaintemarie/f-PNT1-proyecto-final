@@ -52,9 +52,6 @@ public static class DbInitializer
         var adminSimple = await userManager.FindByNameAsync("admin");
         if (adminSimple == null)
         {
-            // Get password from environment variable or configuration
-            var adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? "Admin123!";
-            
             adminSimple = new Usuario
             {
                 UserName = "admin",
@@ -64,7 +61,7 @@ public static class DbInitializer
                 EmailConfirmed = true
             };
 
-            var result = await userManager.CreateAsync(adminSimple, adminPassword);
+            var result = await userManager.CreateAsync(adminSimple, "Admin123!");
             
             if (result.Succeeded)
             {
