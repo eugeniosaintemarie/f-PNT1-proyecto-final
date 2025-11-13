@@ -1,0 +1,65 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options
+.vs/
+.vscode/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Publish folders
+[Pp]ublish/
+publish/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Configuration files with secrets (keep templates only)
+appsettings.Development.json
+**/appsettings.Local.json
+
+# Database files
+*.mdf
+*.ldf
+*.ndf
+
+# User uploads (if they contain sensitive data)
+wwwroot/uploads/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Node modules (if using frontend build tools)
+node_modules/
+npm-debug.log*
+
+# Other
+*.cache
+*.log
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Files that might contain secrets
+**/connectionstrings.json
+**/*secrets.json
