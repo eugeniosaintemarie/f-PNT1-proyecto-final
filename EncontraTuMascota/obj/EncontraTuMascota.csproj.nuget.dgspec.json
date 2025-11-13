@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\Administrator\\Documents\\Git\\f-PNT1-proyecto-final\\EncontraTuMascota\\EncontraTuMascota.csproj": {}
+    "C:\\Users\\Administrator\\Documents\\Git\\f-PNT1-proyecto-final\\EncontraTuMascota\\EncontraTuMascota.csproj": {}
   },
   "projects": {
-    "c:\\Users\\Administrator\\Documents\\Git\\f-PNT1-proyecto-final\\EncontraTuMascota\\EncontraTuMascota.csproj": {
+    "C:\\Users\\Administrator\\Documents\\Git\\f-PNT1-proyecto-final\\EncontraTuMascota\\EncontraTuMascota.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\Administrator\\Documents\\Git\\f-PNT1-proyecto-final\\EncontraTuMascota\\EncontraTuMascota.csproj",
+        "projectUniqueName": "C:\\Users\\Administrator\\Documents\\Git\\f-PNT1-proyecto-final\\EncontraTuMascota\\EncontraTuMascota.csproj",
         "projectName": "EncontraTuMascota",
-        "projectPath": "c:\\Users\\Administrator\\Documents\\Git\\f-PNT1-proyecto-final\\EncontraTuMascota\\EncontraTuMascota.csproj",
+        "projectPath": "C:\\Users\\Administrator\\Documents\\Git\\f-PNT1-proyecto-final\\EncontraTuMascota\\EncontraTuMascota.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\Administrator\\Documents\\Git\\f-PNT1-proyecto-final\\EncontraTuMascota\\obj\\",
+        "outputPath": "C:\\Users\\Administrator\\Documents\\Git\\f-PNT1-proyecto-final\\EncontraTuMascota\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

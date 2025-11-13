@@ -2,9 +2,6 @@ using EncontraTuMascota.Models;
 
 namespace EncontraTuMascota.Helpers;
 
-/// <summary>
-/// Clase para generar datos de prueba de mascotas.
-/// </summary>
 public static class DatosDePrueba
 {
     public const bool USAR_DATOS_DE_PRUEBA = true;

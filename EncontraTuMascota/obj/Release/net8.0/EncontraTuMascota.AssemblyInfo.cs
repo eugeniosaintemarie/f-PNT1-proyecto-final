@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EncontraTuMascota")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0d0b686d783583de9b6a8db1d5be2626f9337a91")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c2bd349fc0c4672edcc84e064b77e33732bf70f4")]
 [assembly: System.Reflection.AssemblyProductAttribute("EncontraTuMascota")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EncontraTuMascota")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

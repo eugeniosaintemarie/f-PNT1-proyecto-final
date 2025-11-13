@@ -8,10 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace EncontraTuMascota.Controllers;
 
-/// <summary>
-/// Controlador para manejar autenticación y registro de usuarios.
-/// Ahora usa ASP.NET Identity en lugar de usuarios hardcodeados.
-/// </summary>
 public class AccountController : Controller
 {
     private readonly UserManager<Usuario> _userManager;
@@ -25,20 +21,16 @@ public class AccountController : Controller
         _context = context;
     }
 
-    // GET: /Account/Login
     [HttpGet]
     public IActionResult Login()
     {
-        // Redirigir al home ya que usamos popup para login
         return Redirect("/");
     }
 
-    // POST: /Account/Login
     [HttpPost]
-    [IgnoreAntiforgeryToken] // Para permitir llamadas AJAX sin token
+    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Login(string username, string password, bool rememberMe = false)
     {
-        // Intentamos hacer login con Identity usando username
         var result = await _signInManager.PasswordSignInAsync(
             username, 
             password, 
@@ -58,33 +50,27 @@ public class AccountController : Controller
         return Unauthorized();
     }
 
-    // GET: /Account/Register
     [HttpGet]
     public IActionResult Register()
     {
-        // Redirigir al home ya que usamos popup para registro
         return Redirect("/");
     }
 
-    // POST: /Account/Register
     [HttpPost]
-    [IgnoreAntiforgeryToken] // Para permitir llamadas AJAX sin token
+    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Register(string nombreCompleto, string username, string? email, string password, string confirmPassword)
     {
-        // Validar que las contraseñas coincidan
         if (password != confirmPassword)
         {
             return BadRequest("Las contraseñas no coinciden");
         }
 
-        // Verificar si el usuario ya existe
         var existingUser = await _userManager.FindByNameAsync(username);
         if (existingUser != null)
         {
             return BadRequest("El nombre de usuario ya está en uso");
         }
 
-        // Verificar si el email ya está en uso (si se proporcionó)
         if (!string.IsNullOrWhiteSpace(email))
         {
             var existingEmail = await _userManager.FindByEmailAsync(email);
@@ -100,25 +86,21 @@ public class AccountController : Controller
             Email = string.IsNullOrWhiteSpace(email) ? null : email,
             NombreCompleto = nombreCompleto,
             FechaRegistro = DateTime.Now,
-            EmailConfirmed = true // No requerimos confirmación de email
+            EmailConfirmed = true
         };
 
         var result = await _userManager.CreateAsync(usuario, password);
 
         if (result.Succeeded)
         {
-            // Asignar rol "Usuario" por defecto
             await _userManager.AddToRoleAsync(usuario, "Usuario");
             
-            // Automáticamente hacemos login después del registro
             await _signInManager.SignInAsync(usuario, isPersistent: false);
             return Ok();
         }
 
-        // Si hay errores, devolvemos mensajes más amigables
         var errorMessages = result.Errors.Select(e => 
         {
-            // Traducir algunos mensajes comunes
             if (e.Code == "DuplicateUserName") return "El nombre de usuario ya existe";
             if (e.Code == "DuplicateEmail") return "El email ya está registrado";
             if (e.Code == "PasswordTooShort") return "La contraseña es muy corta";
@@ -131,23 +113,19 @@ public class AccountController : Controller
         return BadRequest(errors);
     }
 
-    // POST: /Account/Logout
     [HttpPost]
-    [IgnoreAntiforgeryToken] // Para permitir llamadas AJAX sin token
+    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
         return Ok();
     }
 
-    // GET: /Account/AccessDenied
     public IActionResult AccessDenied()
     {
-        // Redirigir al home en lugar de mostrar una vista
         return Redirect("/");
     }
 
-    // GET: /Account/MisPublicaciones
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> MisPublicaciones()
@@ -158,7 +136,6 @@ public class AccountController : Controller
             return Redirect("/");
         }
 
-        // Obtener todas las publicaciones del usuario con la mascota relacionada
         var publicaciones = await _context.Publicaciones
             .Include(p => p.Mascota)
             .Where(p => p.UsuarioId == usuario.Id)
@@ -169,7 +146,6 @@ public class AccountController : Controller
         return View(publicaciones);
     }
 
-    // POST: /Account/CerrarPublicacion
     [Authorize]
     [HttpPost]
     [IgnoreAntiforgeryToken]
@@ -203,7 +179,6 @@ public class AccountController : Controller
         return Ok();
     }
 
-    // GET: /Account/EditarPublicacion
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> EditarPublicacion(int id)
@@ -224,7 +199,6 @@ public class AccountController : Controller
             return RedirectToAction("MisPublicaciones");
         }
 
-        // No se pueden editar publicaciones cerradas
         if (publicacion.Cerrada)
         {
             TempData["Error"] = "No se pueden editar publicaciones cerradas";
@@ -234,7 +208,6 @@ public class AccountController : Controller
         return View(publicacion);
     }
 
-    // POST: /Account/EditarPublicacion
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -262,7 +235,6 @@ public class AccountController : Controller
             return RedirectToAction("MisPublicaciones");
         }
 
-        // Actualizar los datos de la mascota
         if (publicacion.Mascota == null)
         {
             TempData["Error"] = "Error al cargar los datos de la mascota";
@@ -281,7 +253,6 @@ public class AccountController : Controller
             publicacion.Mascota.FotoUrl = model.Mascota.FotoUrl;
         }
 
-        // Actualizar descripción de la publicación si se proporcionó
         if (!string.IsNullOrWhiteSpace(model.Descripcion))
         {
             publicacion.Descripcion = model.Descripcion;
@@ -293,7 +264,6 @@ public class AccountController : Controller
         return RedirectToAction("MisPublicaciones");
     }
 
-    // POST: /Account/EliminarPublicacion
     [Authorize]
     [HttpPost]
     [IgnoreAntiforgeryToken]
@@ -319,7 +289,6 @@ public class AccountController : Controller
             return BadRequest("Error: mascota no encontrada");
         }
 
-        // Eliminar la mascota (cascade delete eliminará la publicación)
         _context.Mascotas.Remove(publicacion.Mascota);
         await _context.SaveChangesAsync();
 

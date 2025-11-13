@@ -24,7 +24,7 @@
 
             @* Input para subir la foto de la mascota *@
             <div class="form-group">
-                <label asp-for="FotoUrl" class="form-label"></label>
+                <label asp-for="FotoUrl" class="form-label">Foto de la mascota *</label>
                 <input type="file" name="foto" id="foto" class="form-control" accept="image/*" required />
                 <span asp-validation-for="FotoUrl" class="text-danger"></span>
             </div>
@@ -95,7 +95,7 @@
                 <label for="descripcion" class="form-label">Descripción</label>
                 <textarea id="descripcion" name="descripcion" class="form-control" rows="5" 
                           placeholder="Describi la mascota: color, tamaño, características especiales, etc." 
-                          required minlength="10" maxlength="1000"></textarea>
+                          required minlength="10" maxlength="1000">@ViewBag.Descripcion</textarea>
                 <!--<small class="form-text">Mínimo 10 caracteres, máximo 1000</small>-->
             </div>
 
@@ -113,4 +113,29 @@
 @* Scripts de validación del lado del cliente (jQuery Validation) *@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Preview de la imagen seleccionada
+        document.getElementById('foto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileName = file.name;
+                const fileSize = (file.size / 1024 / 1024).toFixed(2); // MB
+                
+                // Mostrar confirmación de que se seleccionó el archivo
+                const label = document.querySelector('label[for="foto"]');
+                if (!document.getElementById('file-info')) {
+                    const info = document.createElement('small');
+                    info.id = 'file-info';
+                    info.className = 'form-text text-success';
+                    info.style.display = 'block';
+                    info.style.marginTop = '5px';
+                    label.parentElement.appendChild(info);
+                }
+                
+                document.getElementById('file-info').innerHTML = 
+                    `✓ Archivo seleccionado: <strong>${fileName}</strong> (${fileSize} MB)`;
+            }
+        });
+    </script>
 }

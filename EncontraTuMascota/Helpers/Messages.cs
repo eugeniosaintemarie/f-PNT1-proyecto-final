@@ -2,7 +2,6 @@ namespace EncontraTuMascota.Helpers;
 
 public static class Messages
 {
-    // Mensajes cuando sale todo bien
     public static class Success
     {
         public const string MascotaPublicada = "¡Mascota publicada exitosamente!";
@@ -10,7 +9,6 @@ public static class Messages
         public const string OperacionExitosa = "Operación realizada con éxito";
     }
 
-    // Mensajes cuando algo sale mal
     public static class Error
     {
         public const string ErrorGeneral = "Ocurrió un error. Por favor, intente nuevamente.";
@@ -19,7 +17,6 @@ public static class Messages
         public const string NoEncontrado = "No se encontró el recurso solicitado.";
     }
 
-    // Mensajes de validación
     public static class Validation
     {
         public const string EmailInvalido = "El formato del correo electrónico no es válido.";

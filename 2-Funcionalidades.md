@@ -1,345 +1,687 @@
-# Encontrá Tu Mascota - Documentación de Funcionalidades
+# 2. Funcionalidades del Sistema "Encuentra Tu Mascota"# Encontrá Tu Mascota - Documentación de Funcionalidades
+
 **Aplicación Web ASP.NET Core MVC 8.0**  
 
-## 📋 Índice
-1. [Resumen del Sistema](#resumen-del-sistema)
-2. [Arquitectura y Tecnologías](#arquitectura-y-tecnologías)
-3. [Modelos de Datos](#modelos-de-datos)
-4. [Funcionalidades Principales](#funcionalidades-principales)
-5. [Controladores](#controladores)
-6. [Vistas y UI](#vistas-y-ui)
-7. [Sistema de Autenticación](#sistema-de-autenticación)
-8. [Base de Datos](#base-de-datos)
-9. [Helpers y Utilidades](#helpers-y-utilidades)
-10. [Validaciones](#validaciones)
+## Visión General
 
-## 🎯 Resumen del Sistema
+## 📋 Índice
+
+"Encuentra Tu Mascota" es una aplicación web ASP.NET Core MVC que conecta personas que han perdido o encontrado mascotas. El sistema permite publicar casos, buscar con filtros avanzados, gestionar publicaciones propias y contactar a otros usuarios de forma segura.1. [Resumen del Sistema](#resumen-del-sistema)
+
+2. [Arquitectura y Tecnologías](#arquitectura-y-tecnologías)
+
+### Stack Tecnológico3. [Modelos de Datos](#modelos-de-datos)
+
+- **Backend**: ASP.NET Core 8.0 MVC + Entity Framework Core 8.04. [Funcionalidades Principales](#funcionalidades-principales)
+
+- **Autenticación**: ASP.NET Core Identity con roles (Admin, Usuario)5. [Controladores](#controladores)
+
+- **Base de Datos**: SQL Server LocalDB6. [Vistas y UI](#vistas-y-ui)
+
+- **Frontend**: Razor Views, Bootstrap 5, JavaScript/jQuery7. [Sistema de Autenticación](#sistema-de-autenticación)
+
+- **Validaciones**: Data Annotations + Custom Validators8. [Base de Datos](#base-de-datos)
+
+9. [Helpers y Utilidades](#helpers-y-utilidades)
+
+---10. [Validaciones](#validaciones)
+
+
+
+## F1: Sistema de Autenticación y Roles## 🎯 Resumen del Sistema
+
 **Encontrá Tu Mascota** es una plataforma web colaborativa diseñada para reunir mascotas perdidas con sus familias. Permite a usuarios registrados publicar mascotas encontradas en la vía pública y facilita la búsqueda mediante filtros avanzados.
 
-### Características Principales:
+### ¿Qué hace?
+
+Permite a los usuarios registrarse, iniciar sesión y gestionar su cuenta. Incluye un sistema de roles que diferencia entre usuarios comunes y administradores.### Características Principales:
+
 - 🔍 **Búsqueda pública** de mascotas con filtros avanzados
-- 📝 **Publicación** de mascotas encontradas (requiere autenticación)
-- 🔒 **Protección de datos** de contacto con sistema de blur
-- 👥 **Sistema de usuarios** con roles (Admin, Usuario)
-- 📱 **Interfaz responsive** con Material Design
 
-## 🏗️ Arquitectura y Tecnologías
+### Archivos involucrados:- 📝 **Publicación** de mascotas encontradas (requiere autenticación)
 
-### Framework y Versiones
-- **ASP.NET Core MVC**: 8.0
-- **Entity Framework Core**: 8.0.0
-- **ASP.NET Core Identity**: 8.0.0
-- **Base de Datos**: SQL Server LocalDB
+- `Controllers/AccountController.cs`- 🔒 **Protección de datos** de contacto con sistema de blur
 
-### Patrón Arquitectónico
-- **MVC (Model-View-Controller)**: Separación de responsabilidades
-- **Repository Pattern**: A través de DbContext
-- **Dependency Injection**: Configurado en Program.cs
+- `Views/Account/Login.cshtml`, `Register.cshtml`- 👥 **Sistema de usuarios** con roles (Admin, Usuario)
 
-### Paquetes NuGet Principales
+- `Views/Shared/_Layout.cshtml` (modal de login/registro)- 📱 **Interfaz responsive** con Material Design
+
+- `Models/Usuario.cs`
+
+- `Helpers/DatosDePrueba.cs` (inicialización de roles)## 🏗️ Arquitectura y Tecnologías
+
+
+
+### ¿Para qué sirve?### Framework y Versiones
+
+- **Seguridad**: Solo usuarios autenticados pueden publicar mascotas- **ASP.NET Core MVC**: 8.0
+
+- **Gestión**: Cada usuario gestiona solo sus propias publicaciones- **Entity Framework Core**: 8.0.0
+
+- **Administración**: El rol Admin tiene permisos especiales- **ASP.NET Core Identity**: 8.0.0
+
+- **UX**: Modal de login AJAX sin recargar página- **Base de Datos**: SQL Server LocalDB
+
+
+
+### Flujo:### Patrón Arquitectónico
+
+1. Usuario accede desde cualquier página- **MVC (Model-View-Controller)**: Separación de responsabilidades
+
+2. Click en "Iniciar Sesión" abre modal- **Repository Pattern**: A través de DbContext
+
+3. Credenciales se validan vía AJAX- **Dependency Injection**: Configurado en Program.cs
+
+4. Si es exitoso, se actualiza UI sin reload
+
+5. Usuario redirigido a página protegida si corresponde### Paquetes NuGet Principales
+
 ```xml
-- Microsoft.EntityFrameworkCore.SqlServer (8.0.0)
+
+---- Microsoft.EntityFrameworkCore.SqlServer (8.0.0)
+
 - Microsoft.EntityFrameworkCore.Tools (8.0.0)
-- Microsoft.EntityFrameworkCore.Design (8.0.0)
+
+## F2: Publicación de Mascotas Perdidas/Encontradas- Microsoft.EntityFrameworkCore.Design (8.0.0)
+
 - Microsoft.AspNetCore.Identity.EntityFrameworkCore (8.0.0)
-```
+
+### ¿Qué hace?```
+
+Permite a usuarios autenticados reportar mascotas perdidas o encontradas mediante un formulario completo con validaciones.
 
 ## 📊 Modelos de Datos
 
-### 1. Usuario (Identity)
-Extiende `IdentityUser` de ASP.NET Core Identity.
-**Propiedades:**
-```csharp
-- Id: string (heredado, PK)
-- UserName: string (heredado, único)
-- Email: string (heredado, opcional)
-- PasswordHash: string (heredado)
-- NombreCompleto: string? (custom)
-- FechaRegistro: DateTime (custom)
-- Publicaciones: ICollection<Publicacion> (navigation property)
-```
-**Funcionalidad:**
-- Gestiona la autenticación y autorización
-- Almacena información de perfil del usuario
-- Relaciona usuarios con sus publicaciones
+### Archivos involucrados:
 
-### 2. Mascota
-**Propiedades:**
-```csharp
-- Id: int (PK, auto-incremental)
-- Sexo: Sexo (enum: Masculino, Femenino)
-- Raza: Raza (enum: 10 razas disponibles)
-- FotoUrl: string (URL de imagen, **requerido**)
-- Ubicacion: string (requerido)
-- FechaPublicacion: DateTime
-- NombreContacto: string (requerido)
-- TelefonoContacto: string (requerido, formato argentino)
-- EmailContacto: string (email de contacto, **requerido**)
+- `Controllers/MascotasController.cs` (acción `Publicar()`)### 1. Usuario (Identity)
+
+- `Views/Mascotas/Publicar.cshtml`Extiende `IdentityUser` de ASP.NET Core Identity.
+
+- `Models/Mascota.cs`, `Publicacion.cs`**Propiedades:**
+
+- `Helpers/TelefonoArgentinoAttribute.cs` (validación personalizada)```csharp
+
+- Id: string (heredado, PK)
+
+### ¿Para qué sirve?- UserName: string (heredado, único)
+
+- **Reportar casos**: Usuarios ingresan detalles de mascotas perdidas/encontradas- Email: string (heredado, opcional)
+
+- **Validación**: Campos obligatorios (foto, email, teléfono argentino)- PasswordHash: string (heredado)
+
+- **Trazabilidad**: Cada publicación queda vinculada al usuario que la creó- NombreCompleto: string? (custom)
+
+- **Información completa**: Descripción, ubicación, fecha, contacto, raza, sexo- FechaRegistro: DateTime (custom)
+
 - Publicaciones: ICollection<Publicacion> (navigation property)
-```
+
+### Campos requeridos:```
+
+- **Foto** (obligatorio): IFormFile subido a `wwwroot/uploads/mascotas/`**Funcionalidad:**
+
+- **Email de contacto** (obligatorio): Para comunicación- Gestiona la autenticación y autorización
+
+- **Teléfono**: Validación de formato argentino- Almacena información de perfil del usuario
+
+- **Descripción**: Detalles del caso- Relaciona usuarios con sus publicaciones
+
+- **Raza y Sexo**: Enums para estandarizar
+
+- **Ubicación y Fecha**: Contexto del avistamiento### 2. Mascota
+
+**Propiedades:**
+
+### Flujo:```csharp
+
+1. Usuario autenticado accede a "Publicar Mascota"- Id: int (PK, auto-incremental)
+
+2. Completa formulario con datos y foto- Sexo: Sexo (enum: Masculino, Femenino)
+
+3. JavaScript muestra preview de foto seleccionada- Raza: Raza (enum: 10 razas disponibles)
+
+4. POST valida campos (ModelState.Remove para FotoUrl)- FotoUrl: string (URL de imagen, **requerido**)
+
+5. Foto se guarda en servidor con nombre único- Ubicacion: string (requerido)
+
+6. Entidades Mascota y Publicacion se crean enlazadas- FechaPublicacion: DateTime
+
+7. Redirect a "Mis Publicaciones"- NombreContacto: string (requerido)
+
+- TelefonoContacto: string (requerido, formato argentino)
+
+---- EmailContacto: string (email de contacto, **requerido**)
+
+- Publicaciones: ICollection<Publicacion> (navigation property)
+
+## F3: Búsqueda y Filtrado de Publicaciones```
+
 **Validaciones:**
-- `[Required]` en campos obligatorios
-- `[StringLength]` para límites de caracteres
+
+### ¿Qué hace?- `[Required]` en campos obligatorios
+
+Proporciona un motor de búsqueda con múltiples filtros para encontrar mascotas por texto, raza, sexo y fecha.- `[StringLength]` para límites de caracteres
+
 - `[TelefonoArgentino]` custom validator para teléfonos
-- `[EmailAddress]` para formato de email
-**Funcionalidad:**
-- Representa mascotas encontradas en la vía pública
-- Almacena datos descriptivos y de contacto
+
+### Archivos involucrados:- `[EmailAddress]` para formato de email
+
+- `Controllers/MascotasController.cs` (acción `Buscar()`)**Funcionalidad:**
+
+- `Views/Mascotas/Buscar.cshtml`- Representa mascotas encontradas en la vía pública
+
+- `Models/Sexo.cs`, `Raza.cs` (enums)- Almacena datos descriptivos y de contacto
+
 - Se relaciona 1:N con Publicaciones
 
-### 3. Publicacion
-**Propiedades:**
-```csharp
-- Id: int (PK, auto-incremental)
+### ¿Para qué sirve?
+
+- **Búsqueda flexible**: Texto libre busca en descripción, ubicación, nombre y contacto### 3. Publicacion
+
+- **Filtros**: Raza (dropdown), Sexo (checkboxes), Fecha (date picker)**Propiedades:**
+
+- **Resultados ordenados**: Por fecha de publicación descendente```csharp
+
+- **Sin autenticación**: Accesible para todos los usuarios- Id: int (PK, auto-incremental)
+
 - MascotaId: int (FK, requerido)
-- Mascota: Mascota (navigation property)
-- UsuarioId: string? (FK, nullable)
-- Usuario: Usuario? (navigation property)
-- Descripcion: string? (opcional)
-- Contacto: string? (opcional)
+
+### Filtros disponibles:- Mascota: Mascota (navigation property)
+
+1. **Texto**: Búsqueda en múltiples campos (LIKE en SQL)- UsuarioId: string? (FK, nullable)
+
+2. **Raza**: Dropdown con valores del enum Raza- Usuario: Usuario? (navigation property)
+
+3. **Sexo**: Checkboxes Macho/Hembra- Descripcion: string? (opcional)
+
+4. **Fecha desde**: Date picker para rango temporal- Contacto: string? (opcional)
+
 - Fecha: DateTime
-- Cerrada: bool (default: false)
-- FechaCierre: DateTime? (nullable)
-- Resolucion: string? (max 500 caracteres, nullable)
-```
-**Validaciones:**
-- `[Display]` para nombres amigables
-- `[StringLength(500)]` en Resolucion
+
+### Flujo:- Cerrada: bool (default: false)
+
+1. Usuario accede a "Buscar Mascota"- FechaCierre: DateTime? (nullable)
+
+2. Aplica filtros deseados- Resolucion: string? (max 500 caracteres, nullable)
+
+3. GET con query strings a `Buscar()````
+
+4. LINQ aplica filtros dinámicos**Validaciones:**
+
+5. Vista renderiza cards con fotos y datos- `[Display]` para nombres amigables
+
+6. Click en card muestra detalles completos- `[StringLength(500)]` en Resolucion
+
 - `[DataType(DataType.MultilineText)]` para Resolucion
-**Funcionalidad:**
+
+---**Funcionalidad:**
+
 - Vincula mascotas con usuarios que las publican
-- Almacena información adicional de contexto
+
+## F4: Gestión de Publicaciones Propias- Almacena información adicional de contexto
+
 - Fecha de publicación para ordenamiento
-- Sistema de cierre de casos con seguimiento de resolución
+
+### ¿Qué hace?- Sistema de cierre de casos con seguimiento de resolución
+
+Permite a cada usuario ver, editar, cerrar y eliminar sus propias publicaciones.
 
 ### 4. Enumeraciones
 
-#### Sexo
-```csharp
-public enum Sexo
+### Archivos involucrados:
+
+- `Controllers/AccountController.cs` (acciones `MisPublicaciones()`, `EditarPublicacion()`, `CerrarPublicacion()`, `EliminarPublicacion()`)#### Sexo
+
+- `Views/Account/MisPublicaciones.cshtml````csharp
+
+- `Views/Account/EditarPublicacion.cshtml`public enum Sexo
+
 {
-    Masculino,
-    Femenino
-}
-```
+
+### ¿Para qué sirve?    Masculino,
+
+- **Control total**: Usuario gestiona solo sus publicaciones    Femenino
+
+- **Actualizar**: Editar datos si hubo cambios (ej. nueva ubicación)}
+
+- **Cerrar caso**: Marcar publicación como resuelta con descripción```
+
+- **Eliminar**: Borrar publicaciones por error o duplicadas
 
 #### Raza
-```csharp
-public enum Raza
-{
-    Labrador,
-    GoldenRetriever,
-    PastorAleman,
-    Bulldog,
-    Beagle,
-    Poodle,
-    YorkshireTerrier,
-    Chihuahua,
-    HuskySiberiano,
-    CockerSpaniel
-}
-```
 
-## 🎮 Funcionalidades Principales
+### Operaciones disponibles:```csharp
+
+public enum Raza
+
+#### **Ver Mis Publicaciones**{
+
+- Lista ordenada por fecha descendente    Labrador,
+
+- Muestra estado: ABIERTA (verde) o CERRADA (gris)    GoldenRetriever,
+
+- Botones contextuales según estado    PastorAleman,
+
+    Bulldog,
+
+#### **Editar**    Beagle,
+
+- Solo disponible para publicaciones abiertas    Poodle,
+
+- Formulario pre-llenado con datos actuales    YorkshireTerrier,
+
+- Validaciones iguales a publicación nueva    Chihuahua,
+
+- Foto actual se mantiene si no se cambia    HuskySiberiano,
+
+    CockerSpaniel
+
+#### **Cerrar Caso**}
+
+- Prompt JavaScript solicita resolución```
+
+- POST marca `Cerrada = true`, registra `FechaCierre` y `Resolucion`
+
+- Publicación ya no aparece en búsquedas activas## 🎮 Funcionalidades Principales
+
+- Útil cuando mascota fue encontrada/devuelta
 
 ### F1: Visualización Pública de Mascotas
-**Descripción:**  
-Cualquier visitante (autenticado o no) puede buscar mascotas publicadas con filtros avanzados.
-**Características:**
-- ✅ Acceso sin autenticación
+
+#### **Eliminar****Descripción:**  
+
+- Confirmación JavaScript antes de borrarCualquier visitante (autenticado o no) puede buscar mascotas publicadas con filtros avanzados.
+
+- Cascade delete borra Publicacion y Mascota**Características:**
+
+- Archivo de foto NO se elimina del servidor (por seguridad)- ✅ Acceso sin autenticación
+
 - ✅ Filtros múltiples combinables:
-  - 📍 Ubicación (búsqueda por texto)
-  - ♀️♂️ Sexo (masculino/femenino)
-  - 🐕 Raza (selector dropdown)
-  - 📅 Fecha desde
-- ✅ Ordenamiento descendente por fecha de publicación
-- ✅ Vista en tarjetas (cards) responsive
-- ✅ Contador de mascotas encontradas
-- 🔒 **Datos de contacto con blur** para usuarios no autenticados
-- ✅ Mensaje invitando a iniciar sesión para ver contactos
+
+### Flujo:  - 📍 Ubicación (búsqueda por texto)
+
+1. Usuario autenticado accede a "Mis Publicaciones"  - ♀️♂️ Sexo (masculino/femenino)
+
+2. Ve lista de sus casos (abiertas y cerradas)  - 🐕 Raza (selector dropdown)
+
+3. Según estado, ve botones:  - 📅 Fecha desde
+
+   - **Abierta**: Editar, Cerrar, Eliminar- ✅ Ordenamiento descendente por fecha de publicación
+
+   - **Cerrada**: Solo Eliminar- ✅ Vista en tarjetas (cards) responsive
+
+4. Al editar: formulario precargado, puede cambiar foto- ✅ Contador de mascotas encontradas
+
+5. Al cerrar: prompt de resolución, marca como cerrada- 🔒 **Datos de contacto con blur** para usuarios no autenticados
+
+6. Al eliminar: confirmación, borrado permanente- ✅ Mensaje invitando a iniciar sesión para ver contactos
+
 **Flujo:**
-1. Usuario accede a `/Mascotas/Buscar`
+
+---1. Usuario accede a `/Mascotas/Buscar`
+
 2. Sistema carga todas las mascotas publicadas
-3. Aplica filtros si se proporcionan
+
+## F5: Contacto3. Aplica filtros si se proporcionan
+
 4. Renderiza tarjetas con información
-5. Si NO está autenticado: muestra contactos con efecto blur
-6. Si SÍ está autenticado: muestra contactos legibles
+
+### ¿Qué hace?5. Si NO está autenticado: muestra contactos con efecto blur
+
+Formulario de contacto genérico para comunicación con administradores del sitio.6. Si SÍ está autenticado: muestra contactos legibles
+
 **Implementación Técnica:**
-- **Controller:** `MascotasController.Buscar()`
-- **View:** `Buscar.cshtml`
-- **LINQ:** Queries con `Where()`, `OrderByDescending()`, `Include()`
+
+### Archivos involucrados:- **Controller:** `MascotasController.Buscar()`
+
+- `Controllers/ContactoController.cs`- **View:** `Buscar.cshtml`
+
+- `Views/Contacto/Index.cshtml`- **LINQ:** Queries con `Where()`, `OrderByDescending()`, `Include()`
+
 - **Razor:** Condicional `@if (User.Identity?.IsAuthenticated)`
 
-### F2: Registro de Usuarios
-**Descripción:**  
-Permite crear cuentas de usuario para acceder a funcionalidades autenticadas.
+### ¿Para qué sirve?
+
+- **Soporte**: Usuarios reportan problemas o consultas### F2: Registro de Usuarios
+
+- **Sin base de datos**: Información se procesa pero no se persiste (placeholder)**Descripción:**  
+
+- **Accesible**: No requiere autenticaciónPermite crear cuentas de usuario para acceder a funcionalidades autenticadas.
+
 **Características:**
-- ✅ Popup modal para mejor UX
+
+---- ✅ Popup modal para mejor UX
+
 - ✅ Validación de unicidad de username
-- ✅ Validación de unicidad de email (si se proporciona)
+
+## F6: Panel de Inicio- ✅ Validación de unicidad de email (si se proporciona)
+
 - ✅ Validación de contraseña en cliente y servidor
-- ✅ Auto-login después del registro exitoso
-- ✅ Asignación automática del rol "Usuario"
+
+### ¿Qué hace?- ✅ Auto-login después del registro exitoso
+
+Landing page con información del sitio y navegación principal.- ✅ Asignación automática del rol "Usuario"
+
 - ✅ Mensajes de error traducidos al español
-- ✅ Confirmación de contraseña
-**Campos del Formulario:**
-- **Nombre Completo** (requerido)
+
+### Archivos involucrados:- ✅ Confirmación de contraseña
+
+- `Controllers/HomeController.cs`**Campos del Formulario:**
+
+- `Views/Home/Index.cshtml`- **Nombre Completo** (requerido)
+
 - **Nombre de Usuario** (requerido, único)
-- **Email** (opcional)
-- **Contraseña** (requerido, min 5 caracteres, minúscula + dígito)
-- **Confirmar Contraseña** (debe coincidir)
-**Validaciones de Contraseña:**
+
+### ¿Para qué sirve?- **Email** (opcional)
+
+- **Bienvenida**: Presenta el propósito del sitio- **Contraseña** (requerido, min 5 caracteres, minúscula + dígito)
+
+- **Navegación**: Links a buscar, publicar y contacto- **Confirmar Contraseña** (debe coincidir)
+
+- **Pública**: Acceso sin autenticación**Validaciones de Contraseña:**
+
 ```csharp
-- RequireDigit = true (al menos un número)
+
+---- RequireDigit = true (al menos un número)
+
 - RequireLowercase = true (al menos una minúscula)
-- RequireUppercase = false (mayúscula opcional)
+
+## Arquitectura de Archivos- RequireUppercase = false (mayúscula opcional)
+
 - RequiredLength = 5 (mínimo 5 caracteres)
-```
-**Flujo:**
-1. Usuario hace click en "Registrarse"
-2. Se abre popup modal con formulario
-3. Completa datos y envía (AJAX)
-4. Backend verifica unicidad de username/email
+
+### **Models/** (Entidades y Lógica de Negocio)```
+
+- `Usuario.cs`: Extiende IdentityUser con campos personalizados (NombreCompleto, FechaRegistro)**Flujo:**
+
+- `Mascota.cs`: Datos de la mascota (foto, ubicación, raza, sexo, contacto)1. Usuario hace click en "Registrarse"
+
+- `Publicacion.cs`: Vincula mascota con usuario, maneja estado (Cerrada, Resolucion)2. Se abre popup modal con formulario
+
+- `Sexo.cs`: Enum (Macho, Hembra)3. Completa datos y envía (AJAX)
+
+- `Raza.cs`: Enum con 10 razas comunes4. Backend verifica unicidad de username/email
+
 5. Valida requisitos de contraseña
-6. Crea usuario en BD
-7. Asigna rol "Usuario"
-8. Inicia sesión automáticamente
-9. Cierra popup y recarga página
-**Implementación Técnica:**
+
+### **Controllers/** (Lógica de Controladores)6. Crea usuario en BD
+
+- `HomeController.cs`: Página de inicio7. Asigna rol "Usuario"
+
+- `MascotasController.cs`: Publicar y buscar mascotas8. Inicia sesión automáticamente
+
+- `AccountController.cs`: Autenticación y gestión de publicaciones propias9. Cierra popup y recarga página
+
+- `ContactoController.cs`: Formulario de contacto**Implementación Técnica:**
+
 - **Controller:** `AccountController.Register()`
-- **View:** Modal en `_Layout.cshtml`
-- **JavaScript:** `handleRegister()` con AJAX
-- **Identity:** `UserManager<Usuario>.CreateAsync()`
 
-### F3: Inicio de Sesión (Login)
-**Descripción:**  
-Autenticación de usuarios registrados mediante username y contraseña.
-**Características:**
+### **Views/** (Interfaz de Usuario)- **View:** Modal en `_Layout.cshtml`
+
+- **Shared/**- **JavaScript:** `handleRegister()` con AJAX
+
+  - `_Layout.cshtml`: Plantilla principal con navbar y modal de login- **Identity:** `UserManager<Usuario>.CreateAsync()`
+
+  - `_LoginPartial.cshtml`: UI de autenticación (botones login/logout)
+
+- **Home/**: Landing page### F3: Inicio de Sesión (Login)
+
+- **Mascotas/**: Publicar y buscar**Descripción:**  
+
+- **Account/**: Login, register, mis publicaciones, editarAutenticación de usuarios registrados mediante username y contraseña.
+
+- **Contacto/**: Formulario de contacto**Características:**
+
 - ✅ Popup modal para mejor UX
-- ✅ Login basado en username (no email)
-- ✅ Opción "Recordarme" (persistent cookie)
-- ✅ Bloqueo temporal tras intentos fallidos
-- ✅ Redirección inteligente post-login
-- ✅ Mensajes de error claros
-- ✅ AJAX sin recarga de página
-**Campos del Formulario:**
-- **Nombre de Usuario** (requerido)
-- **Contraseña** (requerido)
-- **Recordarme** (checkbox opcional)
-**Flujo:**
-1. Usuario hace click en "Acceder" o "Iniciar Sesión"
-2. Se abre popup modal
-3. Ingresa credenciales y envía (AJAX)
-4. Backend valida con Identity
-5. Si es exitoso: crea cookie de autenticación
-6. Si vino desde "Publicar mascota": redirige allí
-7. Si no: recarga página actual
-**Implementación Técnica:**
-- **Controller:** `AccountController.Login()`
-- **View:** Modal en `_Layout.cshtml`
-- **JavaScript:** `handleLogin()`, `mostrarLoginConRedireccion()`
-- **Identity:** `SignInManager<Usuario>.PasswordSignInAsync()`
-- **Redirect Logic:** Variable global `redirectAfterLogin`
 
-### F4: Publicar Mascota
+### **Helpers/** (Utilidades)- ✅ Login basado en username (no email)
+
+- `TelefonoArgentinoAttribute.cs`: Validador personalizado de teléfonos argentinos- ✅ Opción "Recordarme" (persistent cookie)
+
+- `Messages.cs`: Mensajes de error/éxito centralizados- ✅ Bloqueo temporal tras intentos fallidos
+
+- `DatosDePrueba.cs`: Seed data para desarrollo (10 publicaciones de prueba)- ✅ Redirección inteligente post-login
+
+- ✅ Mensajes de error claros
+
+### **Data/** (Acceso a Datos)- ✅ AJAX sin recarga de página
+
+- `ApplicationDbContext.cs`: DbContext con DbSets de Usuario, Mascota, Publicacion**Campos del Formulario:**
+
+- `DbInitializer.cs`: Inicializa roles (Admin, Usuario) y usuario admin- **Nombre de Usuario** (requerido)
+
+- **Contraseña** (requerido)
+
+### **Migrations/** (Migraciones de Base de Datos)- **Recordarme** (checkbox opcional)
+
+- `InitialCreate`: Tablas Mascotas y Publicaciones**Flujo:**
+
+- `AddIdentity`: Integra ASP.NET Core Identity1. Usuario hace click en "Acceder" o "Iniciar Sesión"
+
+- `AddPublicacionCerrada`: Agrega campos Cerrada, FechaCierre, Resolucion2. Se abre popup modal
+
+3. Ingresa credenciales y envía (AJAX)
+
+---4. Backend valida con Identity
+
+5. Si es exitoso: crea cookie de autenticación
+
+## Flujos de Usuario Principales6. Si vino desde "Publicar mascota": redirige allí
+
+7. Si no: recarga página actual
+
+### 1. Usuario nuevo publica mascota perdida**Implementación Técnica:**
+
+1. Accede al sitio → "Publicar Mascota"- **Controller:** `AccountController.Login()`
+
+2. Modal de login aparece (no autenticado)- **View:** Modal en `_Layout.cshtml`
+
+3. Click en "Registrarse" → completa formulario- **JavaScript:** `handleLogin()`, `mostrarLoginConRedireccion()`
+
+4. Después de registro, redirect a "Publicar Mascota"- **Identity:** `SignInManager<Usuario>.PasswordSignInAsync()`
+
+5. Completa formulario con foto y detalles- **Redirect Logic:** Variable global `redirectAfterLogin`
+
+6. Submit → mascota publicada
+
+7. Redirect a "Mis Publicaciones"### F4: Publicar Mascota
+
 **Descripción:**  
-Permite a usuarios autenticados publicar mascotas encontradas.
-**Características:**
-- 🔒 **Requiere autenticación** (atributo `[Authorize]`)
-- ✅ Formulario con validaciones client-side y server-side
-- ✅ Carga de foto (URL)
-- ✅ Asociación automática con usuario actual
+
+### 2. Usuario busca mascota encontradaPermite a usuarios autenticados publicar mascotas encontradas.
+
+1. Accede al sitio → "Buscar Mascota"**Características:**
+
+2. Aplica filtros: texto "golden", raza "Golden Retriever"- 🔒 **Requiere autenticación** (atributo `[Authorize]`)
+
+3. Ve resultados con fotos- ✅ Formulario con validaciones client-side y server-side
+
+4. Click en card para ver contacto y descripción completa- ✅ Carga de foto (URL)
+
+5. Llama/envía email al contacto desde los datos visibles- ✅ Asociación automática con usuario actual
+
 - ✅ Mensaje de éxito con redirección
-- ✅ Popup de advertencia si intenta acceder sin login
-**Campos del Formulario:**
-- **Foto (URL)** (**requerido**)
-- **Ubicación** (requerido)
-- **Sexo** (radio buttons: Masculino/Femenino)
-- **Raza** (selector dropdown)
-- **Descripción** (textarea, opcional)
+
+### 3. Usuario cierra caso exitoso- ✅ Popup de advertencia si intenta acceder sin login
+
+1. Login → "Mis Publicaciones"**Campos del Formulario:**
+
+2. Ve su publicación abierta- **Foto (URL)** (**requerido**)
+
+3. Click en "Cerrar Caso"- **Ubicación** (requerido)
+
+4. Ingresa resolución: "Encontrada en parque, devuelta a dueño"- **Sexo** (radio buttons: Masculino/Femenino)
+
+5. Publicación se marca como cerrada (cambia a gris)- **Raza** (selector dropdown)
+
+6. Ya no aparece en búsquedas activas- **Descripción** (textarea, opcional)
+
 - **Nombre de contacto** (requerido)
-- **Teléfono de Contacto** (requerido, validación especial)
-- **Email de contacto** (**requerido**)
-**Validaciones Especiales:**
-- Teléfono con formato argentino (custom attribute)
-- Todos los campos con validación HTML5
+
+### 4. Administrador gestiona contenido- **Teléfono de Contacto** (requerido, validación especial)
+
+1. Login con usuario admin (admin@test.com / Admin123!)- **Email de contacto** (**requerido**)
+
+2. Puede ver todas las publicaciones en "Buscar"**Validaciones Especiales:**
+
+3. Accede a "Mis Publicaciones" → ve 10 publicaciones de prueba- Teléfono con formato argentino (custom attribute)
+
+4. Puede editar/cerrar/eliminar cualquiera de las suyas- Todos los campos con validación HTML5
+
 - Validación de modelo en servidor
-**Flujo (Usuario Autenticado):**
+
+---**Flujo (Usuario Autenticado):**
+
 1. Usuario hace click en "Publicar mascota"
-2. Sistema verifica autenticación
+
+## Aspectos Técnicos Destacados2. Sistema verifica autenticación
+
 3. Renderiza formulario
-4. Usuario completa datos y envía
-5. Backend valida datos
-6. Crea entidad Mascota
-7. Crea entidad Publicacion vinculada
-8. Asocia UsuarioId del usuario actual
+
+### Seguridad4. Usuario completa datos y envía
+
+- **Autorización**: Atributo `[Authorize]` en acciones sensibles5. Backend valida datos
+
+- **Validación**: Server-side en POST + client-side con unobtrusive validation6. Crea entidad Mascota
+
+- **Roles**: Admin y Usuario con permisos diferenciados7. Crea entidad Publicacion vinculada
+
+- **Password hashing**: Manejado por ASP.NET Core Identity8. Asocia UsuarioId del usuario actual
+
 9. Guarda en BD
-10. Redirige a Buscar con mensaje de éxito
-**Flujo (Usuario NO Autenticado):**
-1. Usuario hace click en "Publicar mascota"
-2. JavaScript detecta falta de autenticación
+
+### Performance10. Redirige a Buscar con mensaje de éxito
+
+- **Eager loading**: Include() para evitar N+1 queries**Flujo (Usuario NO Autenticado):**
+
+- **Archivos estáticos**: Fotos servidas desde wwwroot1. Usuario hace click en "Publicar mascota"
+
+- **Validaciones tempranas**: ModelState valida antes de queries DB2. JavaScript detecta falta de autenticación
+
 3. Muestra popup de advertencia
-4. Usuario hace click en "Iniciar Sesión"
-5. Se abre modal de login con redirect flag
-6. Tras login exitoso: redirige a `/Mascotas/Publicar`
-**Implementación Técnica:**
-- **Controller:** `MascotasController.Publicar()` (GET y POST)
+
+### UX4. Usuario hace click en "Iniciar Sesión"
+
+- **Modal AJAX**: Login/registro sin reload5. Se abre modal de login con redirect flag
+
+- **Preview de foto**: JavaScript muestra archivo antes de upload6. Tras login exitoso: redirige a `/Mascotas/Publicar`
+
+- **Validación en tiempo real**: jQuery Validation Unobtrusive**Implementación Técnica:**
+
+- **Mensajes claros**: TempData comunica éxito/error entre requests- **Controller:** `MascotasController.Publicar()` (GET y POST)
+
 - **View:** `Publicar.cshtml`
-- **Authorization:** `[Authorize]` attribute
-- **JavaScript:** `mostrarAvisoAuth()` para usuarios no auth
-- **Identity:** `UserManager<Usuario>.GetUserAsync(User)`
+
+### Validaciones Personalizadas- **Authorization:** `[Authorize]` attribute
+
+- **TelefonoArgentinoAttribute**: Regex para formato argentino (ej. 11-1234-5678)- **JavaScript:** `mostrarAvisoAuth()` para usuarios no auth
+
+- **Required en foto y email**: Atributos HTML5 + server-side check- **Identity:** `UserManager<Usuario>.GetUserAsync(User)`
+
+- **Enums**: Restringen valores de Raza y Sexo
 
 ### F5: Cierre de Sesión (Logout)
-**Descripción:**  
+
+---**Descripción:**  
+
 Permite a usuarios autenticados cerrar su sesión.
-**Características:**
+
+## Cumplimiento del Checklist (0-Checklist.md)**Características:**
+
 - ✅ AJAX sin recarga de página
-- ✅ Limpia todas las cookies de Identity
-- ✅ Recarga página para actualizar UI
-**Flujo:**
-1. Usuario hace click en "Salir"
-2. JavaScript envía POST a `/Account/Logout` (AJAX)
+
+### ✅ Requerimientos de Arquitectura- ✅ Limpia todas las cookies de Identity
+
+- **MVC**: Controllers, Models, Views correctamente separados- ✅ Recarga página para actualizar UI
+
+- **Entity Framework Core**: ApplicationDbContext + Migrations**Flujo:**
+
+- **Identity**: Autenticación con roles Admin y Usuario1. Usuario hace click en "Salir"
+
+- **Validaciones**: Data Annotations + Custom Attribute2. JavaScript envía POST a `/Account/Logout` (AJAX)
+
 3. Backend limpia sesión con SignInManager
-4. Retorna OK
-5. Cliente recarga página
-6. UI muestra estado no autenticado
-**Implementación Técnica:**
-- **Controller:** `AccountController.Logout()`
+
+### ✅ Funcionalidades Obligatorias4. Retorna OK
+
+- **F1 (Auth)**: Login, registro, logout funcionales5. Cliente recarga página
+
+- **F2 (Publicar)**: Formulario completo con validaciones6. UI muestra estado no autenticado
+
+- **F3 (Buscar)**: Filtros múltiples y búsqueda por texto**Implementación Técnica:**
+
+- **F4 (Gestionar)**: Editar, cerrar, eliminar publicaciones- **Controller:** `AccountController.Logout()`
+
 - **JavaScript:** `cerrarSesion()` en `_Layout.cshtml`
-- **Identity:** `SignInManager<Usuario>.SignOutAsync()`
 
-### F6: Protección de Datos de Contacto
-**Descripción:**  
-Sistema de privacidad que oculta datos sensibles a usuarios no autenticados.
+### ✅ Características Adicionales- **Identity:** `SignInManager<Usuario>.SignOutAsync()`
+
+- **Seed data**: DatosDePrueba.cs con 10 casos de prueba
+
+- **Roles**: Admin tiene publicaciones precargadas### F6: Protección de Datos de Contacto
+
+- **Estado de casos**: Campo `Cerrada` en Publicacion**Descripción:**  
+
+- **Resolución**: Campo de texto para describir cierreSistema de privacidad que oculta datos sensibles a usuarios no autenticados.
+
 **Características:**
-- 🔒 Datos con efecto visual blur para no autenticados
+
+---- 🔒 Datos con efecto visual blur para no autenticados
+
 - ✅ Mensaje invitando a iniciar sesión
-- ✅ Revelación completa para usuarios autenticados
-- ✅ Link directo al modal de login
-**Datos Protegidos:**
-- Nombre de contacto
-- Teléfono de contacto
-- Email de contacto
-**Implementación Visual:**
-```css
-.contacto-blur {
-    filter: blur(5px);
-    user-select: none;
-    pointer-events: none;
-}
-```
-**Implementación Técnica:**
-- **Razor Conditional:** `@if (User.Identity?.IsAuthenticated)`
-- **CSS:** Clase `.contacto-blur`
-- **View:** `Buscar.cshtml`
 
-### F7: Panel de Usuario - Mis Publicaciones
-**Descripción:**  
-Panel personal donde usuarios autenticados pueden ver y gestionar sus publicaciones.
+## Notas de Implementación- ✅ Revelación completa para usuarios autenticados
+
+- ✅ Link directo al modal de login
+
+### Base de Datos**Datos Protegidos:**
+
+- **LocalDB**: (localdb)\mssqllocaldb- Nombre de contacto
+
+- **Nombre**: EncontraTuMascotaDB- Teléfono de contacto
+
+- **Migraciones**: Aplicadas automáticamente al iniciar (DbInitializer)- Email de contacto
+
+**Implementación Visual:**
+
+### Usuarios de Prueba```css
+
+- **Admin**: admin@test.com / Admin123!.contacto-blur {
+
+- **Usuario**: usuario@test.com / Usuario123!    filter: blur(5px);
+
+    user-select: none;
+
+### Archivos Subidos    pointer-events: none;
+
+- **Ruta**: wwwroot/uploads/mascotas/}
+
+- **Formato**: {Guid}-{filename}.{ext}```
+
+- **Tipos permitidos**: .jpg, .jpeg, .png, .gif (validación client-side recomendada)**Implementación Técnica:**
+
+- **Razor Conditional:** `@if (User.Identity?.IsAuthenticated)`
+
+### Próximas Mejoras Sugeridas- **CSS:** Clase `.contacto-blur`
+
+1. Validación client-side de tipos de archivo en foto- **View:** `Buscar.cshtml`
+
+2. Compresión de imágenes antes de subir
+
+3. Paginación en búsqueda y "Mis Publicaciones"### F7: Panel de Usuario - Mis Publicaciones
+
+4. Notificaciones por email cuando hay match de búsqueda**Descripción:**  
+
+5. Administración centralizada para rol Admin (ver todas las publicaciones)Panel personal donde usuarios autenticados pueden ver y gestionar sus publicaciones.
+
 **Características:**
-- 🔒 **Requiere autenticación**
+
+---- 🔒 **Requiere autenticación**
+
 - ✅ Lista todas las publicaciones del usuario actual
-- ✅ Ordenadas por fecha descendente (más recientes primero)
+
+**Última actualización**: Este documento refleja el estado del proyecto con todas las funcionalidades implementadas y validadas.- ✅ Ordenadas por fecha descendente (más recientes primero)
+
 - ✅ Información completa de cada publicación:
   - Ubicación
   - Sexo, Raza y Fecha

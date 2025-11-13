@@ -4,10 +4,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>328</x>
-      <y>120</y>
-      <w>240</w>
-      <h>240</h>
+      <x>288</x>
+      <y>136</y>
+      <w>216</w>
+      <h>228</h>
     </coordinates>
     <panel_attributes>*Mascota*
 --
@@ -16,81 +16,79 @@
 - Sexo: Sexo (enum)
 - Raza: Raza (enum)
 - Ubicacion: string
-- Descripcion: string
-- FechaHallazgo: DateTime
+- FechaPublicacion: DateTime
+- NombreContacto: string
+- TelefonoContacto: string
+- EmailContacto: string
 --
 + Publicaciones: ICollection&lt;Publicacion&gt;
 --
 Validaciones:
 • FotoUrl: Required
-• Sexo, Raza: Required (enum)
-• Ubicacion: Required, MaxLength(200)
-• Descripcion: Required, 10-500 chars</panel_attributes>
+• EmailContacto: Required, EmailAddress
+• TelefonoContacto: TelefonoArgentino
+• Ubicacion: Required, MaxLength(200)</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
       <x>48</x>
-      <y>424</y>
-      <w>260</w>
-      <h>264</h>
+      <y>496</y>
+      <w>172</w>
+      <h>208</h>
     </coordinates>
     <panel_attributes>*Publicacion*
 --
 - Id: int {PK}
 - MascotaId: int {FK}
-- UsuarioId: int {FK}
+- UsuarioId: string {FK, nullable}
 - Descripcion: string
-- Estado: EstadoPublicacion (enum)
-- FechaPublicacion: DateTime
+- Contacto: string
+- Fecha: DateTime
+- Cerrada: bool
 - FechaCierre: DateTime?
+- Resolucion: string?
 --
 + Mascota: Mascota (navigation)
 + Usuario: Usuario (navigation)
 --
-Datos contacto (solo autenticados):
-• NombreRescatista: string
-• Telefono: string
-• Email: string
 Validaciones:
-• Descripcion: Required, 10-1000 chars
-• NombreRescatista: Required, 2-100 chars
-• Telefono: TelefonoArgentino (custom)
-• Email: Required, EmailAddress</panel_attributes>
+• Descripcion: 10-1000 chars
+• Resolucion: MaxLength(500)</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>560</x>
-      <y>544</y>
+      <x>536</x>
+      <y>496</y>
       <w>400</w>
-      <h>168</h>
+      <h>180</h>
     </coordinates>
-    <panel_attributes>*Usuario*
+    <panel_attributes>*Usuario* (hereda IdentityUser)
 --
-- Id: int {PK}
-- NombreUsuario: string
-- Email: string
-- PasswordHash: string
-- FechaRegistro: DateTime
-- EsActivo: bool
+- Id: string {PK, heredado}
+- UserName: string {heredado, unique}
+- Email: string {heredado, nullable}
+- PasswordHash: string {heredado}
+- NombreCompleto: string? {custom}
+- FechaRegistro: DateTime {custom}
+--
++ Publicaciones: ICollection&lt;Publicacion&gt; {custom}
 --
 Validaciones:
-• NombreUsuario: Required, Unique, 3-30 chars
-• Email: Required, EmailAddress, Unique, MaxLength(150)
-• PasswordHash: Required (política de contraseña aplicada antes de hashear)
-• EsActivo: true por defecto (soft delete)</panel_attributes>
+• NombreCompleto: 2-100 chars
+• Password: Min 5 chars, lowercase, digit</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>608</x>
-      <y>120</y>
-      <w>180</w>
-      <h>100</h>
+      <x>536</x>
+      <y>136</y>
+      <w>132</w>
+      <h>68</h>
     </coordinates>
     <panel_attributes>&lt;&lt;enum&gt;&gt;
 *Sexo*
@@ -102,10 +100,10 @@ Femenino</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>608</x>
-      <y>240</y>
-      <w>180</w>
-      <h>164</h>
+      <x>536</x>
+      <y>216</y>
+      <w>92</w>
+      <h>244</h>
     </coordinates>
     <panel_attributes>&lt;&lt;enum&gt;&gt;
 *Raza*
@@ -115,37 +113,26 @@ GoldenRetriever
 PastorAleman
 Bulldog
 Beagle
+Poodle
 Chihuahua
 YorkshireTerrier
+Boxer
+Dalmata
 HuskySiberiano
-Poodle
-CockerSpaniel</panel_attributes>
+Rottweiler
+CockerSpaniel
+Schnauzer
+Mestizo
+Otra</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>352</x>
-      <y>424</y>
-      <w>180</w>
-      <h>120</h>
-    </coordinates>
-    <panel_attributes>&lt;&lt;enum&gt;&gt;
-*EstadoPublicacion*
---
-Publicada
-EnProceso
-Cerrada
-Archivada</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>824</x>
-      <y>120</y>
-      <w>240</w>
-      <h>140</h>
+      <x>704</x>
+      <y>136</y>
+      <w>136</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Controller&gt;&gt;
 *HomeController*
@@ -164,77 +151,66 @@ Responsabilidad:
     <id>UMLClass</id>
     <coordinates>
       <x>48</x>
-      <y>712</y>
-      <w>328</w>
+      <y>728</y>
+      <w>364</w>
       <h>196</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Controller&gt;&gt;
-*PublicacionesController*
+*MascotasController*
 --
-- _publicacionesService: IPublicacionesService
-- _autenticacionService: IAutenticacionService
+- _context: ApplicationDbContext
+- _webHostEnvironment: IWebHostEnvironment
+- _userManager: UserManager&lt;Usuario&gt;
 --
-+ Index(FiltroPublicacionesViewModel): IActionResult
-+ Detalles(int id): IActionResult
-+ Crear(): IActionResult
-+ Crear(PublicacionViewModel): IActionResult
-+ MisPublicaciones(): IActionResult
-+ Cerrar(int id): IActionResult
++ Buscar(termino, sexoM, sexoF, raza, fecha): Task&lt;IActionResult&gt;
++ Publicar() [Authorize]: IActionResult
++ Publicar(Mascota, descripcion, foto) [Authorize]: Task&lt;IActionResult&gt;
 --
 Responsabilidad:
-• Exponer listado público sin datos de contacto
-• Revelar contacto cuando el usuario está autenticado
-• Gestionar ciclo de vida de publicaciones creadas por usuarios</panel_attributes>
+• Búsqueda pública con filtros (ubicación, sexo, raza, fecha)
+• Publicación de mascotas (autenticado)
+• Validación de foto obligatoria (IFormFile)
+• Asociación automática de UsuarioId
+• Seed de datos de prueba</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1024</x>
-      <y>536</y>
-      <w>320</w>
-      <h>128</h>
+      <x>536</x>
+      <y>728</y>
+      <w>412</w>
+      <h>236</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Controller&gt;&gt;
-*AutenticacionController*
+*AccountController*
 --
-+ Login(LoginViewModel): IActionResult
-+ Logout(): IActionResult
-+ RefreshSession(): IActionResult
+- _userManager: UserManager&lt;Usuario&gt;
+- _signInManager: SignInManager&lt;Usuario&gt;
+- _context: ApplicationDbContext
 --
-Responsabilidad:
-• Gestionar inicio/cierre de sesión con credenciales persistidas
-• Emitir claims/cookies seguros y controlar expiración
-• Integrarse con políticas de autorización de publicaciones</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>1024</x>
-      <y>672</y>
-      <w>324</w>
-      <h>116</h>
-    </coordinates>
-    <panel_attributes>&lt;&lt;Controller&gt;&gt;
-*RegistroController*
---
-+ Registrar(): IActionResult
-+ Registrar(RegistroViewModel): IActionResult
++ Login(username, password, rememberMe) [AJAX]: Task&lt;IActionResult&gt;
++ Register(nombreCompleto, username, email, pwd) [AJAX]: Task&lt;IActionResult&gt;
++ Logout() [AJAX]: Task&lt;IActionResult&gt;
++ MisPublicaciones() [Authorize]: Task&lt;IActionResult&gt;
++ EditarPublicacion(id) [Authorize]: Task&lt;IActionResult&gt;
++ EditarPublicacion(id, model) [Authorize, POST]: Task&lt;IActionResult&gt;
++ CerrarPublicacion(id, resolucion) [Authorize, AJAX]: Task&lt;IActionResult&gt;
++ EliminarPublicacion(id) [Authorize, AJAX]: Task&lt;IActionResult&gt;
 --
 Responsabilidad:
-• Validar unicidad de nombre de usuario y email
-• Aplicar políticas de contraseña y confirmación
-• Crear usuario activo y redirigir a experiencia autenticada</panel_attributes>
+• Autenticación con ASP.NET Identity
+• Gestión completa de publicaciones propias
+• Cierre de casos con resolución</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
       <x>48</x>
-      <y>120</y>
+      <y>136</y>
       <w>200</w>
-      <h>100</h>
+      <h>92</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Helper&gt;&gt;
 *DatosDePrueba*
@@ -253,7 +229,7 @@ prueba con imágenes Unsplash</panel_attributes>
       <x>48</x>
       <y>240</y>
       <w>200</w>
-      <h>80</h>
+      <h>72</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Attribute&gt;&gt;
 *TelefonoArgentinoAttribute*
@@ -267,7 +243,7 @@ Valida formato +54...</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>48</x>
-      <y>328</y>
+      <y>320</y>
       <w>200</w>
       <h>70</h>
     </coordinates>
@@ -281,78 +257,66 @@ del sistema</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>296</x>
+      <x>208</x>
       <y>352</y>
-      <w>56</w>
-      <h>88</h>
+      <w>136</w>
+      <h>168</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
 m2=0..*
-tiene</panel_attributes>
-    <additional_attributes>40.0;10.0;10.0;90.0</additional_attributes>
+tiene (cascade)</panel_attributes>
+    <additional_attributes>100.0;15.0;15.0;190.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>296</x>
-      <y>560</y>
-      <w>280</w>
+      <x>208</x>
+      <y>512</y>
+      <w>344</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-
-m1=1
+m1=0..1
 m2=0..*
-propietario</panel_attributes>
-    <additional_attributes>330.0;20.0;10.0;20.0</additional_attributes>
+propietario (SetNull)</panel_attributes>
+    <additional_attributes>410.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>560</x>
-      <y>160</y>
-      <w>64</w>
+      <x>496</x>
+      <y>144</y>
+      <w>56</w>
       <h>32</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 usa</panel_attributes>
-    <additional_attributes>60.0;20.0;10.0;20.0</additional_attributes>
+    <additional_attributes>50.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>560</x>
-      <y>240</y>
-      <w>64</w>
+      <x>496</x>
+      <y>224</y>
+      <w>56</w>
       <h>32</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 usa</panel_attributes>
-    <additional_attributes>60.0;20.0;10.0;20.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>296</x>
-      <y>456</y>
-      <w>72</w>
-      <h>32</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-usa</panel_attributes>
-    <additional_attributes>70.0;20.0;10.0;20.0</additional_attributes>
+    <additional_attributes>50.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>240</x>
-      <y>144</y>
-      <w>104</w>
+      <y>160</y>
+      <w>64</w>
       <h>32</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 genera</panel_attributes>
-    <additional_attributes>10.0;20.0;110.0;20.0</additional_attributes>
+    <additional_attributes>10.0;20.0;60.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
@@ -360,17 +324,17 @@ genera</panel_attributes>
       <x>16</x>
       <y>272</y>
       <w>56</w>
-      <h>200</h>
+      <h>272</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 valida</panel_attributes>
-    <additional_attributes>40.0;230.0;10.0;230.0;10.0;10.0;40.0;10.0</additional_attributes>
+    <additional_attributes>40.0;320.0;10.0;320.0;10.0;10.0;40.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>96</x>
-      <y>680</y>
+      <y>696</y>
       <w>40</w>
       <h>48</h>
     </coordinates>
@@ -381,60 +345,33 @@ usa</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>952</x>
-      <y>560</y>
-      <w>88</w>
-      <h>32</h>
+      <x>928</x>
+      <y>552</y>
+      <w>112</w>
+      <h>208</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-gestiona</panel_attributes>
-    <additional_attributes>10.0;20.0;90.0;20.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>952</x>
-      <y>648</y>
-      <w>88</w>
-      <h>80</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-
-crea</panel_attributes>
-    <additional_attributes>10.0;10.0;90.0;80.0</additional_attributes>
+gestiona/crea</panel_attributes>
+    <additional_attributes>10.0;10.0;40.0;10.0;40.0;240.0;20.0;240.0</additional_attributes>
   </element>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>560</x>
+      <x>592</x>
       <y>16</y>
-      <w>300</w>
-      <h>88</h>
+      <w>292</w>
+      <h>112</h>
     </coordinates>
-    <panel_attributes>*Estado Actual del Proyecto*
+    <panel_attributes>*Estado Actual del Proyecto - 100% COMPLETO* ✅
 --
-✅ MVC con Publicaciones, Autenticación y Registro
-✅ Flujo público sin exponer datos de contacto
-✅ Gestión autenticada de publicaciones y cierre de casos
-✅ Validaciones de registro, contacto y teléfono argentino
-✅ Datos de prueba opcionales para demostraciones
-bg=yellow</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLNote</id>
-    <coordinates>
-      <x>864</x>
-      <y>16</y>
-      <w>200</w>
-      <h>80</h>
-    </coordinates>
-    <panel_attributes>*Pendientes*
---
-⏳ Entity Framework Core
-⏳ ASP.NET Identity
-⏳ Roles/Autorización
-⏳ Herencia en modelos
-bg=orange</panel_attributes>
+✅ Entity Framework Core 8.0 con SQL Server LocalDB
+✅ ASP.NET Core Identity con roles (Admin, Usuario)
+✅ Herencia: Usuario extends IdentityUser
+✅ Publicar, buscar, editar, cerrar y eliminar publicaciones
+✅ Validación custom TelefonoArgentino + foto obligatoria
+✅ AJAX modals para login/registro
+✅ Panel "Mis Publicaciones" con gestión completa
+bg=green</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -442,15 +379,18 @@ bg=orange</panel_attributes>
     <coordinates>
       <x>48</x>
       <y>16</y>
-      <w>280</w>
-      <h>80</h>
+      <w>536</w>
+      <h>112</h>
     </coordinates>
-    <panel_attributes>*Arquitectura*
+    <panel_attributes>*Arquitectura y Stack Tecnológico*
 --
-• Patrón MVC (Model-View-Controller)
-• Inyección de dependencias (Session, Singleton)
-• Material Design UI con CSS custom
-• Helpers para validaciones y datos de prueba
+• **Framework**: ASP.NET Core MVC 8.0
+• **ORM**: Entity Framework Core 8.0 con migraciones (InitialCreate, AddIdentity, AddPublicacionCerrada)
+• **Autenticación**: ASP.NET Core Identity con UserManager y SignInManager
+• **Base de Datos**: SQL Server LocalDB (EncontraTuMascotaDB)
+• **Inyección de Dependencias**: DbContext, UserManager, SignInManager, IWebHostEnvironment
+• **UI**: Razor Views + Bootstrap 5 + JavaScript/jQuery (AJAX modals)
+• **Validaciones**: Data Annotations + Custom Attributes (TelefonoArgentinoAttribute)
 bg=blue</panel_attributes>
     <additional_attributes/>
   </element>
