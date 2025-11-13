@@ -96,42 +96,57 @@ public class MascotasController : Controller
 
     public async Task<IActionResult> Buscar(string? termino, bool sexoMasculino = false, bool sexoFemenino = false, int? raza = null, DateTime? fechaDesde = null)
     {
-        var query = _context.Mascotas.Include(m => m.Publicaciones).AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(termino))
+        try
         {
-            query = query.Where(m => m.Ubicacion!.Contains(termino));
-        }
+            var query = _context.Mascotas
+                .Include(m => m.Publicaciones)
+                .AsNoTracking()
+                .AsQueryable();
 
-        if (sexoMasculino || sexoFemenino)
+            if (!string.IsNullOrWhiteSpace(termino))
+            {
+                query = query.Where(m => m.Ubicacion!.Contains(termino));
+            }
+
+            if (sexoMasculino || sexoFemenino)
+            {
+                query = query.Where(m => 
+                    (sexoMasculino && m.Sexo == Sexo.Masculino) ||
+                    (sexoFemenino && m.Sexo == Sexo.Femenino));
+            }
+
+            if (raza.HasValue)
+            {
+                query = query.Where(m => (int)m.Raza == raza.Value);
+            }
+
+            if (fechaDesde.HasValue)
+            {
+                query = query.Where(m => m.FechaPublicacion >= fechaDesde.Value);
+            }
+
+            var mascotas = await query.OrderByDescending(m => m.FechaPublicacion).ToListAsync();
+
+            var publicaciones = await _context.Publicaciones
+                .Include(p => p.Mascota)
+                .AsNoTracking()
+                .ToListAsync();
+
+            ViewBag.Termino = termino;
+            ViewBag.SexoMasculino = sexoMasculino;
+            ViewBag.SexoFemenino = sexoFemenino;
+            ViewBag.RazaSeleccionada = raza;
+            ViewBag.FechaDesde = fechaDesde?.ToString("yyyy-MM-dd");
+            ViewBag.Publicaciones = publicaciones;
+            
+            return View(mascotas);
+        }
+        catch (Exception ex)
         {
-            query = query.Where(m => 
-                (sexoMasculino && m.Sexo == Sexo.Masculino) ||
-                (sexoFemenino && m.Sexo == Sexo.Femenino));
+            Console.WriteLine($"❌ Error en Buscar: {ex.Message}");
+            ViewBag.Publicaciones = new List<Publicacion>();
+            return View(new List<Mascota>());
         }
-
-        if (raza.HasValue)
-        {
-            query = query.Where(m => (int)m.Raza == raza.Value);
-        }
-
-        if (fechaDesde.HasValue)
-        {
-            query = query.Where(m => m.FechaPublicacion >= fechaDesde.Value);
-        }
-
-        var mascotas = await query.OrderByDescending(m => m.FechaPublicacion).ToListAsync();
-
-        var publicaciones = await _context.Publicaciones.Include(p => p.Mascota).ToListAsync();
-
-        ViewBag.Termino = termino;
-        ViewBag.SexoMasculino = sexoMasculino;
-        ViewBag.SexoFemenino = sexoFemenino;
-        ViewBag.RazaSeleccionada = raza;
-        ViewBag.FechaDesde = fechaDesde?.ToString("yyyy-MM-dd");
-        ViewBag.Publicaciones = publicaciones;
-        
-        return View(mascotas);
     }
 }
 
